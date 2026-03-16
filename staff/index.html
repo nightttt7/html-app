@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五线谱练习</title>
+    <!-- 引入 VexFlow 库用于渲染五线谱 -->
+    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 1000px;
+        }
+        #staff-container {
+            margin: 20px 0;
+            background: #fff;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+        }
+        .status-panel {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 6px;
+            background: #e9ecef;
+            display: inline-block;
+        }
+        .log-panel {
+            text-align: left;
+            font-size: 0.9em;
+            line-height: 1.5;
+            color: #666;
+            height: calc(10 * 1.5em);
+            overflow-y: auto;
+            width: 100%;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+            padding-top: 10px;
+            box-sizing: border-box;
+        }
+        .log-panel:empty::before {
+            content: '等待日志...';
+            color: #aaa;
+        }
+        .note-info {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .btn-practice {
+            padding: 8px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #28a745;
+            color: white;
+            margin: 10px 5px;
+        }
+        .btn-practice:hover { background: #218838; }
+        .btn-practice.active { background: #dc3545; }
+        .difficulty-panel {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .difficulty-panel label {
+            font-weight: bold;
+            color: #555;
+        }
+        .difficulty-panel select {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.95em;
+        }
+        .custom-notes-panel {
+            margin: 8px 0;
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 4px;
+        }
+        .custom-notes-panel.show { display: flex; }
+        .note-toggle {
+            padding: 4px 8px;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            background: #f0f0f0;
+            user-select: none;
+        }
+        .note-toggle.selected {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .note-toggle.sharp { font-style: italic; color: #888; }
+        .note-toggle.sharp.selected { color: white; }
+        .practice-info {
+            font-size: 1.1em;
+            color: #333;
+            display: block;
+        }
+        .practice-info:empty { display: none; }
+        .btn-restart {
+            padding: 8px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #ffc107;
+            color: #333;
+            margin: 10px 5px;
+            display: none;
+        }
+        .btn-restart:hover { background: #e0a800; }
+        .btn-restart.show { display: inline-block; }
+        .shortcuts-panel {
+            display: inline-block;
+            font-size: 0.85em;
+            color: #888;
+            text-align: left;
+            grid-column: 3;
+            justify-self: end;
+        }
+        .shortcuts-panel kbd {
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 1px 5px;
+            font-size: 0.9em;
+        }
+        .btn-toggle {
+            padding: 6px 14px;
+            font-size: 0.9em;
+            border: 1px solid #007bff;
+            border-radius: 6px;
+            cursor: pointer;
+            background: white;
+            color: #007bff;
+            margin: 5px;
+        }
+        .btn-toggle.active {
+            background: #007bff;
+            color: white;
+        }
+        .preset-panel {
+            margin: 6px 0 2px;
+            display: none;
+        }
+        .preset-panel.show { display: block; }
+        .btn-preset {
+            padding: 4px 12px;
+            font-size: 0.85em;
+            border: 1px solid #6c757d;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #f8f9fa;
+            color: #333;
+            margin: 0 3px;
+        }
+        .btn-preset:hover { background: #e2e6ea; }
+        .btn-song {
+            padding: 8px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background: #17a2b8;
+            color: white;
+            margin: 10px 5px;
+        }
+        .btn-song:hover { background: #138496; }
+        .btn-song.active { background: #dc3545; }
+        #btn-song-segment-restart {
+            background: #7ec8e3;
+            color: white;
+        }
+        #btn-song-segment-restart:hover { background: #66b8d8; }
+        .song-panel {
+            margin: 10px 0;
+            display: none;
+        }
+        .song-panel.show { display: block; }
+        .song-panel select {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.95em;
+        }
+        .song-info {
+            font-size: 1.1em;
+            color: #333;
+            display: block;
+        }
+        .song-info:empty { display: none; }
+        .info-panel {
+            width: 100%;
+            max-width: 760px;
+            margin: 8px auto 14px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .info-slot {
+            min-height: 1.6em;
+            width: 100%;
+        }
+        .info-slot .practice-info,
+        .info-slot .song-info {
+            width: 100%;
+            white-space: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .top-controls {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: flex-start;
+            gap: 20px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        .mode-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            grid-column: 2;
+            justify-self: center;
+            min-width: 280px;
+        }
+        .mode-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .mode-info {
+            text-align: center;
+            width: 100%;
+        }
+        .restart-panel {
+            margin: 16px 0 8px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        @media (max-width: 760px) {
+            .top-controls {
+                grid-template-columns: 1fr;
+                justify-items: center;
+            }
+            .mode-panel,
+            .shortcuts-panel {
+                grid-column: 1;
+                justify-self: center;
+            }
+            .shortcuts-panel {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>五线谱练习</h1>
+        
+        <div class="status-panel">
+            状态: <span id="status">等待 MIDI 访问...</span> | 
+            当前音符: <span id="current-note" class="note-info">-</span>
+        </div>
+
+        <div class="top-controls">
+            <div class="mode-panel">
+                <div class="mode-buttons">
+                    <button class="btn-practice" id="btn-practice" onclick="togglePractice()">练习模式</button>
+                    <button class="btn-song" id="btn-song" onclick="toggleSongMode()">歌曲模式</button>
+                </div>
+            </div>
+            <span class="shortcuts-panel">
+                <kbd>C2</kbd> 练习模式<br>
+                <kbd>D2</kbd> 歌曲模式<br>
+                <kbd>F#2</kbd> 显示/隐藏音名<br>
+                <kbd>A#2</kbd> 重新开始<br>
+                <kbd>C#/3</kbd> 重新开始本段
+            </span>
+        </div>
+
+        <div class="info-panel">
+            <div class="info-slot">
+                <span class="practice-info" id="practice-info"></span>
+                <span class="song-info" id="song-info"></span>
+            </div>
+        </div>
+
+        <div class="song-panel" id="song-panel">
+            <label>选择歌曲:</label>
+            <select id="song-select" onchange="onSongChange()"></select>
+        </div>
+
+        <div class="difficulty-panel" id="difficulty-panel">
+            <label>难度:</label>
+            <select id="difficulty" onchange="onDifficultyChange()">
+                <option value="easy">简单（无半音）</option>
+                <option value="hard">困难（有半音）</option>
+                <option value="custom">自定义</option>
+            </select>
+        </div>
+        <div class="preset-panel" id="preset-panel">
+            <button class="btn-preset" onclick="applyPreset('line')">线</button>
+            <button class="btn-preset" onclick="applyPreset('space')">间</button>
+            <button class="btn-preset" onclick="applyPreset('sharp')">半音</button>
+        </div>
+        <div class="custom-notes-panel" id="custom-notes-panel"></div>
+
+        <div>
+            <button class="btn-toggle" id="btn-show-names" onclick="toggleNoteNames()">显示音名</button>
+        </div>
+
+        <div id="staff-container"></div>
+
+        <div class="restart-panel" id="restart-panel">
+            <button class="btn-restart" id="btn-restart" onclick="restartPractice()">重新开始</button>
+            <button class="btn-restart" id="btn-song-restart" onclick="restartSong()">重新开始</button>
+            <button class="btn-restart" id="btn-song-segment-restart" onclick="restartSongSegment()">重新开始本段</button>
+        </div>
+
+        <div class="log-panel" id="log"></div>
+    </div>
+
+    <script>
+        const { Renderer, Stave, StaveNote, Voice, Formatter, GhostNote, BarNote, Dot } = Vex.Flow;
+
+        const container = document.getElementById('staff-container');
+        const statusEl = document.getElementById('status');
+        const currentNoteEl = document.getElementById('current-note');
+        const logEl = document.getElementById('log');
+
+        let activeNotes = new Set();
+        let historyNotes = [];
+        let renderer, context, stave;
+        let showNoteNames = false;
+
+        // ===== 歌曲数据 =====
+        // 说明:
+        // 1. 每首歌结构: { name, timeSignature, measures }
+        // 2. measures 是“小节数组”, 每个小节里放“音符/休止符数组”。
+        // 3. 普通音符优先使用 songNote(key, duration, midi, options)，不要手写裸对象，除非保持完全同构。
+        // 4. 休止符使用 songRest(duration, options)，其 midi 必须为 null，rest 必须为 true。
+        // 5. duration 当前支持: 'w' 全音符, 'h' 二分, 'q' 四分, '8' 八分, '16' 十六分。
+        // 6. 附点写法: options 里传 { dots: 1 }、{ dots: 2 } 等，例如 songNote('C/5', 'h', 72, { dots: 1 })。
+        // 7. 升号直接写在 key 里，例如 'F#/4'、'G#/4'；当前逻辑会自动补升号记号。
+        // 8. 每个小节的总拍数必须严格等于 timeSignature，例如 4/4 小节总拍数必须是 4，3/4 必须是 3，否则整页可能渲染失败或只显示空白五线谱。
+        // 9. 当前歌曲模式按“可演奏音符”推进进度，休止符会显示但不会要求 MIDI 输入。
+        // 10. 新增歌曲后，若出现空白谱面，优先检查: 小节拍数是否正确、duration 是否受支持、休止符是否使用 songRest、附点是否写在 dots 中。
+        // 11. songNote / songRest 返回的数据最终都要兼容: { keys, duration, midi, dots, rest }。
+        function songNote(key, duration, midi, options = {}) {
+            return { keys: [key], duration, midi, dots: 0, rest: false, ...options };
+        }
+
+        function songRest(duration, options = {}) {
+            return { keys: ['b/4'], duration, midi: null, dots: 0, rest: true, ...options };
+        }
+
+        const SONGS = [
+            {
+                name: '小星星',
+                timeSignature: '4/4',
+                measures: [
+                    [songNote('C/4', 'q', 60), songNote('C/4', 'q', 60), songNote('G/4', 'q', 67), songNote('G/4', 'q', 67)],
+                    [songNote('A/4', 'q', 69), songNote('A/4', 'q', 69), songNote('G/4', 'h', 67)],
+                    [songNote('F/4', 'q', 65), songNote('F/4', 'q', 65), songNote('E/4', 'q', 64), songNote('E/4', 'q', 64)],
+                    [songNote('D/4', 'q', 62), songNote('D/4', 'q', 62), songNote('C/4', 'h', 60)],
+                    [songNote('G/4', 'q', 67), songNote('G/4', 'q', 67), songNote('F/4', 'q', 65), songNote('F/4', 'q', 65)],
+                    [songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('D/4', 'h', 62)],
+                    [songNote('G/4', 'q', 67), songNote('G/4', 'q', 67), songNote('F/4', 'q', 65), songNote('F/4', 'q', 65)],
+                    [songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('D/4', 'h', 62)],
+                    [songNote('C/4', 'q', 60), songNote('C/4', 'q', 60), songNote('G/4', 'q', 67), songNote('G/4', 'q', 67)],
+                    [songNote('A/4', 'q', 69), songNote('A/4', 'q', 69), songNote('G/4', 'h', 67)],
+                    [songNote('F/4', 'q', 65), songNote('F/4', 'q', 65), songNote('E/4', 'q', 64), songNote('E/4', 'q', 64)],
+                    [songNote('D/4', 'q', 62), songNote('D/4', 'q', 62), songNote('C/4', 'h', 60)],
+                ]
+            },
+            {
+                name: '欢乐颂',
+                timeSignature: '4/4',
+                measures: [
+                    [songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('F/4', 'q', 65), songNote('G/4', 'q', 67)],
+                    [songNote('G/4', 'q', 67), songNote('F/4', 'q', 65), songNote('E/4', 'q', 64), songNote('D/4', 'q', 62)],
+                    [songNote('C/4', 'q', 60), songNote('C/4', 'q', 60), songNote('D/4', 'q', 62), songNote('E/4', 'q', 64)],
+                    [songNote('E/4', 'q', 64), songNote('D/4', 'q', 62), songNote('D/4', 'h', 62)],
+                    [songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('F/4', 'q', 65), songNote('G/4', 'q', 67)],
+                    [songNote('G/4', 'q', 67), songNote('F/4', 'q', 65), songNote('E/4', 'q', 64), songNote('D/4', 'q', 62)],
+                    [songNote('C/4', 'q', 60), songNote('C/4', 'q', 60), songNote('D/4', 'q', 62), songNote('E/4', 'q', 64)],
+                    [songNote('D/4', 'q', 62), songNote('C/4', 'q', 60), songNote('C/4', 'h', 60)],
+                ]
+            },
+            {
+                name: '玛丽有只小羊羔',
+                timeSignature: '4/4',
+                measures: [
+                    [songNote('E/4', 'q', 64), songNote('D/4', 'q', 62), songNote('C/4', 'q', 60), songNote('D/4', 'q', 62)],
+                    [songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('E/4', 'h', 64)],
+                    [songNote('D/4', 'q', 62), songNote('D/4', 'q', 62), songNote('D/4', 'h', 62)],
+                    [songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('G/4', 'h', 67)],
+                    [songNote('E/4', 'q', 64), songNote('D/4', 'q', 62), songNote('C/4', 'q', 60), songNote('D/4', 'q', 62)],
+                    [songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('E/4', 'q', 64)],
+                    [songNote('D/4', 'q', 62), songNote('D/4', 'q', 62), songNote('E/4', 'q', 64), songNote('D/4', 'q', 62)],
+                    [songNote('C/4', 'w', 60)],
+                ]
+            },
+            {
+                name: '两只老虎',
+                timeSignature: '4/4',
+                measures: [
+                    [songNote('C/4', 'q', 60), songNote('D/4', 'q', 62), songNote('E/4', 'q', 64), songNote('C/4', 'q', 60)],
+                    [songNote('C/4', 'q', 60), songNote('D/4', 'q', 62), songNote('E/4', 'q', 64), songNote('C/4', 'q', 60)],
+                    [songNote('E/4', 'q', 64), songNote('F/4', 'q', 65), songNote('G/4', 'h', 67)],
+                    [songNote('E/4', 'q', 64), songNote('F/4', 'q', 65), songNote('G/4', 'h', 67)],
+                    [songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('F/4', 'q', 65)],
+                    [songNote('E/4', 'q', 64), songNote('C/4', 'q', 60), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69)],
+                    [songNote('G/4', 'q', 67), songNote('F/4', 'q', 65), songNote('E/4', 'q', 64), songNote('C/4', 'q', 60)],
+                    [songNote('C/4', 'q', 60), songNote('G/4', 'q', 67), songNote('C/4', 'h', 60)],
+                ]
+            },
+            {
+                name: '粉刷匠',
+                timeSignature: '4/4',
+                measures: [
+                    [songNote('G/4', 'q', 67), songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64)],
+                    [songNote('C/4', 'q', 60), songNote('D/4', 'q', 62), songNote('E/4', 'h', 64)],
+                    [songNote('G/4', 'q', 67), songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64)],
+                    [songNote('C/4', 'q', 60), songNote('D/4', 'q', 62), songNote('E/4', 'h', 64)],
+                    [songNote('D/4', 'q', 62), songNote('F/4', 'q', 65), songNote('E/4', 'q', 64), songNote('D/4', 'q', 62)],
+                    [songNote('G/4', 'h', 67), songNote('E/4', 'h', 64)],
+                    [songNote('G/4', 'q', 67), songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64)],
+                    [songNote('C/4', 'q', 60), songNote('D/4', 'q', 62), songNote('C/4', 'h', 60)],
+                ]
+            },
+            {
+                name: '红河谷',
+                timeSignature: '4/4',
+                measures: [
+                    [songNote('G/4', 'q', 67), songNote('E/4', 'q', 64), songNote('C/4', 'q', 60), songNote('C/4', 'q', 60)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64), songNote('G/4', 'q', 67)],
+                    [songNote('A/4', 'q', 69), songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64)],
+                    [songNote('D/4', 'q', 62), songNote('C/4', 'q', 60), songNote('C/4', 'h', 60)],
+                    [songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('C/5', 'q', 72)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64), songNote('G/4', 'q', 67)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64), songNote('D/4', 'q', 62)],
+                    [songNote('C/4', 'q', 60), songNote('D/4', 'q', 62), songNote('C/4', 'h', 60)],
+                ]
+            },
+            {
+                name: '送别',
+                timeSignature: '4/4',
+                measures: [
+                    [songNote('G/4', 'q', 67), songNote('C/5', 'q', 72), songNote('C/5', 'q', 72), songNote('A/4', 'q', 69)],
+                    [songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('G/4', 'h', 67)],
+                    [songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('G/4', 'q', 67)],
+                    [songNote('E/4', 'q', 64), songNote('D/4', 'q', 62), songNote('C/4', 'h', 60)],
+                    [songNote('G/4', 'q', 67), songNote('C/5', 'q', 72), songNote('C/5', 'q', 72), songNote('A/4', 'q', 69)],
+                    [songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('G/4', 'h', 67)],
+                    [songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('G/4', 'q', 67)],
+                    [songNote('D/4', 'q', 62), songNote('C/4', 'q', 60), songNote('C/4', 'h', 60)],
+                ]
+            },
+            {
+                name: '雪绒花',
+                timeSignature: '3/4',
+                measures: [
+                    [songNote('C/4', 'q', 60), songNote('E/4', 'q', 64), songNote('G/4', 'q', 67)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64)],
+                    [songNote('C/4', 'q', 60), songNote('E/4', 'q', 64), songNote('G/4', 'q', 67)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64)],
+                    [songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('C/5', 'q', 72)],
+                    [songNote('B/4', 'q', 71), songNote('A/4', 'q', 69), songNote('G/4', 'q', 67)],
+                    [songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69)],
+                    [songNote('G/4', 'q', 67), songNote('E/4', 'q', 64), songNote('C/4', 'q', 60)],
+                ]
+            },
+            {
+                name: '铃儿响叮当',
+                timeSignature: '4/4',
+                measures: [
+                    [songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('E/4', 'h', 64)],
+                    [songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('E/4', 'h', 64)],
+                    [songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('C/4', 'q', 60), songNote('D/4', 'q', 62)],
+                    [songNote('E/4', 'w', 64)],
+                    [songNote('F/4', 'q', 65), songNote('F/4', 'q', 65), songNote('F/4', 'q', 65), songNote('F/4', 'q', 65)],
+                    [songNote('F/4', 'q', 65), songNote('E/4', 'q', 64), songNote('E/4', 'q', 64), songNote('E/4', 'q', 64)],
+                    [songNote('E/4', 'q', 64), songNote('D/4', 'q', 62), songNote('D/4', 'q', 62), songNote('E/4', 'q', 64)],
+                    [songNote('D/4', 'h', 62), songNote('G/4', 'h', 67)],
+                ]
+            },
+            {
+                name: '茉莉花',
+                timeSignature: '4/4',
+                measures: [
+                    [songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('C/5', 'q', 72)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'h', 64)],
+                    [songNote('E/4', 'q', 64), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('C/5', 'q', 72)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'h', 64)],
+                    [songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64)],
+                    [songNote('D/4', 'q', 62), songNote('E/4', 'q', 64), songNote('G/4', 'h', 67)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('E/4', 'q', 64), songNote('D/4', 'q', 62)],
+                    [songNote('C/4', 'q', 60), songNote('D/4', 'q', 62), songNote('C/4', 'h', 60)],
+                ]
+            },
+            {
+                name: '天空之城',
+                timeSignature: '4/4',
+                measures: [
+                    [songRest('h', { dots: 1 }), songNote('A/4', '8', 69), songNote('B/4', '8', 71)],
+                    [songNote('C/5', 'q', 72), songNote('B/4', 'q', 71), songNote('C/5', 'q', 72), songNote('E/5', 'q', 76)],
+                    [songNote('B/4', 'h', 71, { dots: 1 }), songNote('E/5', 'q', 76)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('C/5', 'q', 72)],
+                    [songNote('G/4', 'h', 67, { dots: 1 }), songNote('E/5', 'q', 76)],
+                    [songNote('F/4', 'q', 65), songNote('E/4', 'q', 64), songNote('F/4', '8', 65), songNote('C/5', '8', 72), songNote('C/5', 'q', 72)],
+                    [songNote('E/5', 'h', 76, { dots: 1 }), songNote('C/5', 'q', 72)],
+                    [songNote('B/4', 'q', 71), songNote('F#/4', 'q', 66), songNote('F#/4', 'q', 66), songNote('B/4', 'q', 71)],
+                    [songNote('B/4', 'h', 71), songRest('q'), songNote('A/4', '8', 69), songNote('B/4', '8', 71)],
+                    [songNote('C/5', 'q', 72), songNote('B/4', 'q', 71), songNote('C/5', 'q', 72), songNote('E/5', 'q', 76)],
+                    [songNote('B/4', 'h', 71, { dots: 1 }), songNote('E/5', '8', 76), songNote('E/5', '8', 76)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('C/5', 'q', 72)],
+                    [songNote('G/4', 'h', 67, { dots: 1 }), songNote('E/5', 'q', 76)],
+                    [songNote('F/4', 'q', 65), songNote('C/5', '8', 72), songNote('B/4', '8', 71), songNote('B/4', 'q', 71), songNote('C/5', 'q', 72)],
+                    [songNote('D/5', '8', 74), songNote('E/5', '8', 76), songNote('C/5', 'h', 72), songRest('q')],
+                    [songNote('C/5', '8', 72), songNote('B/4', '8', 71), songNote('A/4', 'q', 69), songNote('B/4', 'q', 71), songNote('G#/4', 'q', 68)],
+                    [songNote('A/4', 'h', 69), songRest('q'), songNote('C/5', '8', 72), songNote('D/5', '8', 74)],
+                    [songNote('E/5', 'q', 76), songNote('D/5', 'q', 74), songNote('E/5', 'q', 76), songNote('G/5', 'q', 79)],
+                    [songNote('D/5', 'h', 74, { dots: 1 }), songNote('G/5', 'q', 79)],
+                    [songNote('D/5', '16', 74), songNote('C/5', '16', 72), songNote('B/4', '16', 71), songNote('C/5', '16', 72), songNote('C/5', 'h', 72), songNote('D/5', '8', 74), songNote('E/5', '8', 76)],
+                    [songNote('E/5', 'w', 76)],
+                    [songNote('A/4', '8', 69), songNote('B/4', '8', 71), songNote('C/5', 'q', 72), songNote('B/4', '8', 71), songNote('C/5', '8', 72), songNote('D/5', '8', 74), songNote('C/5', '8', 72)],
+                    [songNote('G/4', '8', 67), songNote('G/4', '8', 67), songNote('G/4', 'h', 67), songNote('C/5', 'q', 72)],
+                    [songNote('F/5', 'q', 77), songNote('E/5', 'q', 76), songNote('D/5', 'q', 74), songNote('C/5', 'q', 72)],
+                    [songNote('E/5', 'h', 76, { dots: 1 }), songNote('A/4', '8', 69), songNote('B/4', '8', 71)],
+                    [songNote('C/5', 'q', 72), songNote('B/4', 'q', 71), songNote('C/5', 'q', 72), songNote('E/5', 'q', 76)],
+                    [songNote('B/4', 'h', 71, { dots: 1 }), songNote('E/5', 'q', 76)],
+                    [songNote('A/4', 'q', 69), songNote('G/4', 'q', 67), songNote('A/4', 'q', 69), songNote('C/5', 'q', 72)],
+                    [songNote('G/4', 'h', 67, { dots: 1 }), songNote('E/5', 'q', 76)],
+                    [songNote('F/5', 'q', 77), songNote('C/5', '8', 72), songNote('B/4', '8', 71), songNote('B/4', 'q', 71), songNote('C/5', 'q', 72)],
+                    [songNote('D/5', '8', 74), songNote('E/5', '8', 76), songNote('C/5', 'q', 72), songNote('C/5', 'h', 72)],
+                    [songNote('C/5', '8', 72), songNote('B/4', '8', 71), songNote('A/4', 'q', 69), songNote('B/4', 'q', 71), songNote('G#/4', 'q', 68)],
+                    [songNote('A/4', 'w', 69)],
+                ]
+            }
+        ];
+
+        // 歌曲模式状态
+        let songMode = false;
+        let currentSong = null;
+        let songMeasureIndex = 0;   // 当前小节索引
+        let songNoteIndex = 0;      // 当前小节内音符索引
+        let songResults = [];       // 当前小节每个音符的结果
+        let songInputs = [];        // 用户实际输入的MIDI音符
+        let songComplete = false;
+
+        // 练习模式状态
+        let practiceMode = false;
+        let practiceNotes = [];      // 16个目标MIDI音符
+        let practiceResults = [];    // 每个位置的状态: null=未输入, 'correct', 'wrong'
+        let practiceInputs = [];     // 每个位置用户实际输入的MIDI音符
+        let practiceIndex = 0;       // 当前需要输入的位置
+        let practiceComplete = false;
+
+        const btnPractice = document.getElementById('btn-practice');
+        const btnRestart = document.getElementById('btn-restart');
+        const practiceInfoEl = document.getElementById('practice-info');
+        const difficultyEl = document.getElementById('difficulty');
+        const customNotesPanel = document.getElementById('custom-notes-panel');
+        const btnShowNames = document.getElementById('btn-show-names');
+        const btnSong = document.getElementById('btn-song');
+        const btnSongRestart = document.getElementById('btn-song-restart');
+        const btnSongSegmentRestart = document.getElementById('btn-song-segment-restart');
+        const songPanel = document.getElementById('song-panel');
+        const songSelect = document.getElementById('song-select');
+        const songInfoEl = document.getElementById('song-info');
+
+        // 初始化歌曲选择列表
+        SONGS.forEach((s, i) => {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = s.name;
+            songSelect.appendChild(opt);
+        });
+
+        // 音符名称列表
+        const ALL_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const NATURAL_INDICES = [0, 2, 4, 5, 7, 9, 11]; // C D E F G A B
+        // 高音谱号 线上的音符 (C4~C6): C4, E4, G4, B4, D5, F5, A5, C6
+        const LINE_MIDI = [60, 64, 67, 71, 74, 77, 81, 84];
+        // 高音谱号 间上的音符 (C4~C6): D4, F4, A4, C5, E5, G5, B5
+        const SPACE_MIDI = [62, 65, 69, 72, 76, 79, 83];
+        // 半音 (C4~C6范围内所有#音符)
+        const SHARP_MIDI = [];
+        for (let m = 60; m <= 84; m++) { if (ALL_NOTE_NAMES[m % 12].includes('#')) SHARP_MIDI.push(m); }
+
+        // 自定义模式: 选中的具体MIDI音符 (默认选中C4~C6范围内的自然音)
+        let customSelectedMidi = new Set();
+        for (let midi = 60; midi <= 84; midi++) {
+            if (NATURAL_INDICES.includes(midi % 12)) customSelectedMidi.add(midi);
+        }
+
+        // 初始化自定义音符选择面板 (按音高区分)
+        function initCustomPanel() {
+            for (let midi = 60; midi <= 84; midi++) {
+                const name = ALL_NOTE_NAMES[midi % 12];
+                const octave = Math.floor(midi / 12) - 1;
+                const btn = document.createElement('span');
+                btn.className = 'note-toggle' + (name.includes('#') ? ' sharp' : '');
+                btn.textContent = name + octave;
+                btn.dataset.midi = midi;
+                if (customSelectedMidi.has(midi)) btn.classList.add('selected');
+                btn.onclick = () => {
+                    const m = parseInt(btn.dataset.midi);
+                    if (customSelectedMidi.has(m)) {
+                        if (customSelectedMidi.size <= 1) return; // 至少保留1个
+                        customSelectedMidi.delete(m);
+                        btn.classList.remove('selected');
+                    } else {
+                        customSelectedMidi.add(m);
+                        btn.classList.add('selected');
+                    }
+                };
+                customNotesPanel.appendChild(btn);
+            }
+        }
+        initCustomPanel();
+
+        const presetPanel = document.getElementById('preset-panel');
+
+        // 应用预设
+        function applyPreset(type) {
+            const midiSet = type === 'line' ? LINE_MIDI : type === 'space' ? SPACE_MIDI : SHARP_MIDI;
+            customSelectedMidi = new Set(midiSet);
+            // 更新面板中所有按钮的选中状态
+            customNotesPanel.querySelectorAll('.note-toggle').forEach(btn => {
+                const m = parseInt(btn.dataset.midi);
+                if (customSelectedMidi.has(m)) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
+        function onDifficultyChange() {
+            const val = difficultyEl.value;
+            if (val === 'custom') {
+                customNotesPanel.classList.add('show');
+                presetPanel.classList.add('show');
+            } else {
+                customNotesPanel.classList.remove('show');
+                presetPanel.classList.remove('show');
+            }
+        }
+
+        const NOTE_WIDTH = 55; // 每个音符占用的宽度
+        const STAVE_START = 10; // 五线谱起始 x 坐标
+        const CLEF_WIDTH = 80; // 谱号 + 拍号占用的宽度
+        const MAX_NOTES = 16;
+        const FIXED_STAVE_WIDTH = CLEF_WIDTH + MAX_NOTES * NOTE_WIDTH + 20;
+        const FIXED_TOTAL_WIDTH = STAVE_START + FIXED_STAVE_WIDTH + 10;
+
+        // 初始化五线谱（固定宽度，始终为16个音符的长度）
+        function drawStave() {
+            container.innerHTML = '';
+            renderer = new Renderer(container, Renderer.Backends.SVG);
+            renderer.resize(FIXED_TOTAL_WIDTH, 230);
+            context = renderer.getContext();
+            
+            context.setFillStyle("#333");
+            context.setStrokeStyle("#333");
+            context.setFont("Arial", 10, "");
+
+            stave = new Stave(STAVE_START, 70, FIXED_STAVE_WIDTH);
+            stave.addClef("treble").addTimeSignature("4/4");
+            stave.setContext(context).draw();
+        }
+
+        // 初始化空五线谱
+        function initStaff() {
+            drawStave();
+        }
+
+        // 将 MIDI 编号转换为音符名 (例如: 60 -> C/4)
+        function midiToNoteName(midi) {
+            const names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+            const octave = Math.floor(midi / 12) - 1;
+            const name = names[midi % 12];
+            return `${name}/${octave}`;
+        }
+
+        function isPlayableSongItem(noteData) {
+            return noteData && !noteData.rest && typeof noteData.midi === 'number';
+        }
+
+        function findNextPlayableSongIndex(noteList, startIndex) {
+            for (let i = startIndex; i < noteList.length; i++) {
+                if (isPlayableSongItem(noteList[i])) return i;
+            }
+            return -1;
+        }
+
+        function applySongDots(note, dots = 0) {
+            for (let i = 0; i < dots; i++) {
+                Dot.buildAndAttach([note], { all: true });
+            }
+        }
+
+        function applyAccidentals(note, keys) {
+            keys.forEach((key, index) => {
+                if (key.includes('#')) {
+                    note.addModifier(new Vex.Flow.Accidental('#'), index);
+                }
+            });
+        }
+
+        function createSongDisplayNote(noteData, color) {
+            const duration = noteData.rest ? `${noteData.duration}r` : noteData.duration;
+            const note = new StaveNote({ keys: noteData.keys, duration });
+            applySongDots(note, noteData.dots || 0);
+            if (!noteData.rest) {
+                note.setStyle({ fillStyle: color, strokeStyle: color });
+                applyAccidentals(note, noteData.keys);
+            }
+            return note;
+        }
+
+        function createSongWrongNote(noteData, inputMidi) {
+            const midiArr = [noteData.midi, inputMidi].sort((a, b) => a - b);
+            const keys = midiArr.map(m => midiToNoteName(m));
+            const colors = midiArr.map(m => m === noteData.midi ? '#aaa' : '#dc3545');
+            const note = new StaveNote({ keys, duration: noteData.duration });
+            applySongDots(note, noteData.dots || 0);
+            keys.forEach((key, idx) => {
+                note.setKeyStyle(idx, { fillStyle: colors[idx], strokeStyle: colors[idx] });
+            });
+            applyAccidentals(note, keys);
+            note.setStemStyle({ fillStyle: '#dc3545', strokeStyle: '#dc3545' });
+            return note;
+        }
+
+        // 创建 StaveNote 的辅助函数
+        function createStaveNote(midiArray, isCurrent = false) {
+            const sorted = [...midiArray].sort((a, b) => a - b);
+            const keys = sorted.map(midi => midiToNoteName(midi));
+            const note = new StaveNote({ keys: keys, duration: "q" });
+            
+            if (isCurrent) {
+                note.setStyle({ fillStyle: "blue", strokeStyle: "blue" });
+            }
+
+            keys.forEach((key, index) => {
+                if (key.includes('#')) {
+                    const accidental = new Vex.Flow.Accidental("#");
+                    try {
+                        if (typeof accidental.setScale === 'function') {
+                            accidental.setScale(0.9);
+                        }
+                    } catch(e) {}
+                    note.addModifier(accidental, index);
+                }
+            });
+            return note;
+        }
+
+        // 根据难度获取可用的MIDI音符池
+        function getNotePool() {
+            const difficulty = difficultyEl.value;
+            let allowedIndices;
+            if (difficulty === 'easy') {
+                allowedIndices = NATURAL_INDICES; // 无半音
+            } else if (difficulty === 'hard') {
+                allowedIndices = ALL_NOTE_NAMES.map((_, i) => i); // 全部12个
+            } else {
+                return Array.from(customSelectedMidi).sort((a, b) => a - b); // 自定义: 直接返回选中的MIDI音符
+            }
+            // 生成 C4(60) ~ C6(84) 范围内属于 allowedIndices 的所有MIDI编号
+            const pool = [];
+            for (let midi = 60; midi <= 84; midi++) {
+                if (allowedIndices.includes(midi % 12)) {
+                    pool.push(midi);
+                }
+            }
+            return pool;
+        }
+
+        // 生成随机MIDI音符
+        function generateRandomNotes(count) {
+            const pool = getNotePool();
+            const notes = [];
+            for (let i = 0; i < count; i++) {
+                notes.push(pool[Math.floor(Math.random() * pool.length)]);
+            }
+            return notes;
+        }
+
+        // 切换练习模式
+        function togglePractice() {
+            if (practiceMode) {
+                practiceMode = false;
+                practiceComplete = false;
+                btnPractice.textContent = '练习模式';
+                btnPractice.classList.remove('active');
+                btnRestart.classList.remove('show');
+                practiceInfoEl.textContent = '';
+                initStaff();
+            } else {
+                if (songMode) exitSongMode(); // 先退出歌曲模式
+                practiceMode = true;
+                btnPractice.textContent = '退出练习';
+                btnPractice.classList.add('active');
+                btnRestart.classList.add('show');
+                startNewRound();
+            }
+        }
+
+        // 重新开始当前练习
+        function restartPractice() {
+            if (practiceMode) {
+                startNewRound();
+            }
+        }
+
+        // 开始新的一局
+        function startNewRound() {
+            practiceNotes = generateRandomNotes(MAX_NOTES);
+            practiceResults = new Array(MAX_NOTES).fill(null);
+            practiceInputs = new Array(MAX_NOTES).fill(null);
+            practiceIndex = 0;
+            practiceComplete = false;
+            practiceStartTime = null;
+            practiceInfoEl.textContent = `进度: 0 / ${MAX_NOTES}`;
+            renderPractice();
+        }
+
+        // 渲染练习模式五线谱
+        function renderPractice() {
+            drawStave();
+
+            const vexNotes = [];
+            for (let i = 0; i < MAX_NOTES; i++) {
+                // 每4个音符插入小节线
+                if (i > 0 && i % 4 === 0) {
+                    vexNotes.push(new BarNote());
+                }
+                const targetMidi = practiceNotes[i];
+                const result = practiceResults[i];
+                const inputMidi = practiceInputs[i];
+
+                if (result === 'correct') {
+                    // 正确：显示绿色音符
+                    const note = createColoredNote(targetMidi, '#28a745');
+                    vexNotes.push(note);
+                } else if (result === 'wrong') {
+                    // 错误：显示灰色目标音符 + 红色输入音符叠加为和弦
+                    const keys = [];
+                    const midiArr = [targetMidi, inputMidi].sort((a, b) => a - b);
+                    const colors = [];
+                    midiArr.forEach(m => {
+                        keys.push(midiToNoteName(m));
+                        colors.push(m === targetMidi ? '#aaa' : '#dc3545');
+                    });
+                    const note = new StaveNote({ keys: keys, duration: 'q' });
+                    // 为每个键设置颜色
+                    keys.forEach((key, idx) => {
+                        note.setKeyStyle(idx, { fillStyle: colors[idx], strokeStyle: colors[idx] });
+                        if (key.includes('#')) {
+                            const acc = new Vex.Flow.Accidental('#');
+                            note.addModifier(acc, idx);
+                        }
+                    });
+                    // 符干颜色用红色
+                    note.setStemStyle({ fillStyle: '#dc3545', strokeStyle: '#dc3545' });
+                    vexNotes.push(note);
+                } else if (i === practiceIndex && !practiceComplete) {
+                    const note = createColoredNote(targetMidi, 'blue');
+                    vexNotes.push(note);
+                } else {
+                    // 未输入：灰色
+                    const note = createColoredNote(targetMidi, '#bbb');
+                    vexNotes.push(note);
+                }
+            }
+
+            try {
+                const voice = new Voice({ num_beats: MAX_NOTES, beat_value: 4 });
+                voice.setStrict(false);
+                voice.addTickables(vexNotes);
+
+                const formatWidth = MAX_NOTES * NOTE_WIDTH;
+                new Formatter().joinVoices([voice]).format([voice], formatWidth);
+                voice.draw(context, stave);
+
+                // 绘制音名标签
+                if (showNoteNames) {
+                    const midiArrays = practiceNotes.map(m => [m]);
+                    const staveNotes = vexNotes.filter(n => n instanceof StaveNote);
+                    drawNoteLabels(staveNotes, midiArrays);
+                }
+            } catch (e) {
+                console.error('练习模式渲染错误:', e);
+            }
+        }
+
+        // 切换音名显示
+        function toggleNoteNames() {
+            showNoteNames = !showNoteNames;
+            btnShowNames.textContent = showNoteNames ? '隐藏音名' : '显示音名';
+            btnShowNames.classList.toggle('active', showNoteNames);
+            if (songMode) {
+                renderSongMeasure();
+            } else if (practiceMode) {
+                renderPractice();
+            } else {
+                updateStaff();
+            }
+        }
+
+        // ===== 歌曲模式 =====
+        function toggleSongMode() {
+            if (songMode) {
+                exitSongMode();
+            } else {
+                if (practiceMode) togglePractice(); // 先退出练习模式
+                songMode = true;
+                btnSong.textContent = '退出歌曲';
+                btnSong.classList.add('active');
+                btnSongRestart.classList.add('show');
+                btnSongSegmentRestart.classList.add('show');
+                songPanel.classList.add('show');
+                document.getElementById('difficulty-panel').style.display = 'none';
+                startSong();
+            }
+        }
+
+        function exitSongMode() {
+            songMode = false;
+            songComplete = false;
+            btnSong.textContent = '歌曲模式';
+            btnSong.classList.remove('active');
+            btnSongRestart.classList.remove('show');
+            btnSongSegmentRestart.classList.remove('show');
+            songPanel.classList.remove('show');
+            document.getElementById('difficulty-panel').style.display = '';
+            songInfoEl.textContent = '';
+            initStaff();
+        }
+
+        function onSongChange() {
+            if (songMode) startSong();
+        }
+
+        function restartSong() {
+            if (songMode) startSong();
+        }
+
+        function restartSongSegment() {
+            if (!songMode || !currentSong) return;
+
+            const pageAnswered = songResults.filter(result => result !== null).length;
+            const pageCorrect = songResults.filter(result => result === 'correct').length;
+            songTotalAnswered = Math.max(0, songTotalAnswered - pageAnswered);
+            songTotalCorrect = Math.max(0, songTotalCorrect - pageCorrect);
+
+            songNoteIndex = findNextPlayableSongIndex(getSongPageNotes(), 0);
+            songComplete = false;
+            const totalNotes = getSongPageNotes().length;
+            songResults = new Array(totalNotes).fill(null);
+            songInputs = new Array(totalNotes).fill(null);
+            if (songTotalAnswered === 0) {
+                songStartTime = null;
+            }
+            updateSongInfo();
+            renderSongMeasure();
+        }
+
+        const SONG_MEASURES_PER_PAGE = 4; // 每页显示的小节数
+
+        function startSong() {
+            currentSong = SONGS[parseInt(songSelect.value)];
+            songMeasureIndex = 0; // 当前页起始小节
+            songComplete = false;
+            songStartTime = null;
+            songTotalCorrect = 0;
+            songTotalAnswered = 0;
+            // 计算整首歌的总音符数
+            songTotalNotes = currentSong.measures.reduce((s, m) => s + m.filter(isPlayableSongItem).length, 0);
+            // songResults 覆盖当前页所有音符
+            const pageNotes = getSongPageNotes();
+            const totalNotes = pageNotes.length;
+            songResults = new Array(totalNotes).fill(null);
+            songInputs = new Array(totalNotes).fill(null);
+            songNoteIndex = findNextPlayableSongIndex(pageNotes, 0);
+            updateSongInfo();
+            renderSongMeasure();
+        }
+
+        // 获取当前页的小节范围
+        function getSongPageMeasures() {
+            if (!currentSong) return [];
+            const start = songMeasureIndex;
+            const end = Math.min(start + SONG_MEASURES_PER_PAGE, currentSong.measures.length);
+            return currentSong.measures.slice(start, end);
+        }
+
+        // 获取当前页所有音符(扁平化)
+        function getSongPageNotes() {
+            const measures = getSongPageMeasures();
+            return measures.reduce((arr, m) => arr.concat(m), []);
+        }
+
+        function updateSongInfo() {
+            if (!currentSong) return;
+            const total = currentSong.measures.length;
+            const endIdx = Math.min(songMeasureIndex + SONG_MEASURES_PER_PAGE, total);
+            let info = `${currentSong.name}  小节: ${songMeasureIndex + 1}-${endIdx} / ${total}`;
+            info += `  |  进度: ${songTotalAnswered} / ${songTotalNotes}`;
+            if (songTotalAnswered > 0) {
+                info += `  |  正确: ${songTotalCorrect}`;
+            }
+            songInfoEl.textContent = info;
+        }
+
+        // 时值对应的拍数
+        function durationBeats(noteOrDuration) {
+            const duration = typeof noteOrDuration === 'string' ? noteOrDuration : noteOrDuration.duration;
+            const dots = typeof noteOrDuration === 'string' ? 0 : (noteOrDuration.dots || 0);
+            const baseDuration = duration.replace('r', '');
+            const map = { 'w': 4, 'h': 2, 'q': 1, '8': 0.5, '16': 0.25 };
+            let beats = map[baseDuration] || 1;
+            let increment = beats / 2;
+            for (let i = 0; i < dots; i++) {
+                beats += increment;
+                increment /= 2;
+            }
+            return beats;
+        }
+
+        // 渲染当前页(4个小节)
+        function renderSongMeasure() {
+            if (!currentSong) return;
+            const pageMeasures = getSongPageMeasures();
+            const allNotes = getSongPageNotes();
+
+            // 动态计算宽度
+            const noteW = 60;
+            const totalNoteCount = allNotes.length;
+            const barlineCount = pageMeasures.length - 1;
+            const measWidth = CLEF_WIDTH + totalNoteCount * noteW + barlineCount * 10 + 30;
+            const totalW = STAVE_START + measWidth + 10;
+
+            container.innerHTML = '';
+            renderer = new Renderer(container, Renderer.Backends.SVG);
+            renderer.resize(totalW, 230);
+            context = renderer.getContext();
+            context.setFillStyle('#333');
+            context.setStrokeStyle('#333');
+            context.setFont('Arial', 10, '');
+
+            const numBeats = allNotes.reduce((s, n) => s + durationBeats(n), 0);
+
+            stave = new Stave(STAVE_START, 70, measWidth);
+            stave.addClef('treble').addTimeSignature(currentSong.timeSignature);
+            stave.setContext(context).draw();
+
+            const vexNotes = [];
+            let globalIdx = 0;
+            pageMeasures.forEach((measure, mi) => {
+                // 小节间插入竖线
+                if (mi > 0) {
+                    vexNotes.push(new BarNote());
+                }
+                measure.forEach((nd, ni) => {
+                    const result = songResults[globalIdx];
+                    const inputMidi = songInputs[globalIdx];
+                    const isPlayable = isPlayableSongItem(nd);
+
+                    if (!isPlayable) {
+                        vexNotes.push(createSongDisplayNote(nd, '#bbb'));
+                    } else if (result === 'correct') {
+                        vexNotes.push(createSongDisplayNote(nd, '#28a745'));
+                    } else if (result === 'wrong') {
+                        vexNotes.push(createSongWrongNote(nd, inputMidi));
+                    } else if (globalIdx === songNoteIndex && !songComplete) {
+                        vexNotes.push(createSongDisplayNote(nd, 'blue'));
+                    } else {
+                        vexNotes.push(createSongDisplayNote(nd, '#bbb'));
+                    }
+                    globalIdx++;
+                });
+            });
+
+            try {
+                const voice = new Voice({ num_beats: numBeats, beat_value: 4 });
+                voice.setStrict(false);
+                voice.addTickables(vexNotes);
+                new Formatter().joinVoices([voice]).format([voice], totalNoteCount * noteW);
+                voice.draw(context, stave);
+
+                if (showNoteNames) {
+                    const midiArrays = allNotes.map(nd => isPlayableSongItem(nd) ? [nd.midi] : null);
+                    const staveNotes = vexNotes.filter(n => n instanceof StaveNote);
+                    drawNoteLabels(staveNotes, midiArrays);
+                }
+            } catch (e) {
+                console.error('歌曲模式渲染错误:', e);
+            }
+        }
+
+        // 处理歌曲模式输入
+        function handleSongInput(midi) {
+            if (!currentSong) return;
+            if (songComplete) {
+                startSong();
+                return;
+            }
+            const allNotes = getSongPageNotes();
+            if (songNoteIndex < 0 || songNoteIndex >= allNotes.length) return;
+            const target = allNotes[songNoteIndex].midi;
+
+            if (midi === target) {
+                songResults[songNoteIndex] = 'correct';
+                songInputs[songNoteIndex] = midi;
+                songTotalCorrect++;
+                log(`♪ 正确: ${midiToNoteName(midi)}`);
+            } else {
+                songResults[songNoteIndex] = 'wrong';
+                songInputs[songNoteIndex] = midi;
+                log(`♪ 错误: 期望 ${midiToNoteName(target)}，输入 ${midiToNoteName(midi)}`);
+            }
+
+            songTotalAnswered++;
+            // 第一次输入时记录开始时间
+            if (songStartTime === null) {
+                songStartTime = Date.now();
+            }
+            const nextPlayableIndex = findNextPlayableSongIndex(allNotes, songNoteIndex + 1);
+
+            if (nextPlayableIndex === -1) {
+                // 当前页完成
+                renderSongMeasure();
+                const nextMeasureIndex = songMeasureIndex + SONG_MEASURES_PER_PAGE;
+                if (nextMeasureIndex >= currentSong.measures.length) {
+                    songComplete = true;
+                    const elapsed = ((Date.now() - songStartTime) / 1000).toFixed(1);
+                    songInfoEl.textContent = `${currentSong.name}  ✓ 完成！用时: ${elapsed}s  正确: ${songTotalCorrect}/${songTotalNotes}  按任意键重新开始`;
+                    return;
+                }
+                songMeasureIndex = nextMeasureIndex;
+                const nextPageNotes = getSongPageNotes();
+                songResults = new Array(nextPageNotes.length).fill(null);
+                songInputs = new Array(nextPageNotes.length).fill(null);
+                songNoteIndex = findNextPlayableSongIndex(nextPageNotes, 0);
+                updateSongInfo();
+                setTimeout(() => renderSongMeasure(), 400);
+            } else {
+                songNoteIndex = nextPlayableIndex;
+                renderSongMeasure();
+            }
+        }
+
+        // MIDI编号转简短音名 (用于标签显示)
+        function midiToLabel(m) {
+            const names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+            const oct = Math.floor(m / 12) - 1;
+            return names[m % 12] + oct;
+        }
+
+        // 在音符上方绘制音名标签
+        function drawNoteLabels(vexNotes, midiArrays) {
+            if (!showNoteNames) return;
+            const svg = container.querySelector('svg');
+            if (!svg) return;
+
+            vexNotes.forEach((vn, i) => {
+                if (!vn || typeof vn.getAbsoluteX !== 'function') return;
+                const midis = midiArrays[i];
+                if (!midis || midis.length === 0) return;
+
+                let x;
+                try { x = vn.getAbsoluteX(); } catch(e) { return; }
+
+                const label = midis.map(m => midiToLabel(m)).join(' ');
+
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', String(x + 5));
+                text.setAttribute('y', '55');
+                text.setAttribute('font-size', '11');
+                text.setAttribute('font-family', 'Arial, sans-serif');
+                text.setAttribute('fill', '#555');
+                text.setAttribute('text-anchor', 'middle');
+                text.textContent = label;
+                svg.appendChild(text);
+            });
+        }
+
+        // 创建带颜色的单音符
+        function createColoredNote(midi, color) {
+            const noteName = midiToNoteName(midi);
+            const note = new StaveNote({ keys: [noteName], duration: 'q' });
+            note.setStyle({ fillStyle: color, strokeStyle: color });
+            if (noteName.includes('#')) {
+                const acc = new Vex.Flow.Accidental('#');
+                note.addModifier(acc, 0);
+            }
+            return note;
+        }
+
+        // 刷新五线谱显示（自由模式）
+        function updateStaff() {
+            const allNotes = [];
+            
+            // 1. 添加历史音符
+            historyNotes.forEach(chord => {
+                if (chord && chord.length > 0) {
+                    allNotes.push(createStaveNote(chord, false));
+                }
+            });
+
+            // 2. 添加当前按下的音符
+            if (activeNotes.size > 0) {
+                allNotes.push(createStaveNote(Array.from(activeNotes), true));
+            }
+
+            if (allNotes.length === 0) {
+                initStaff();
+                return;
+            }
+
+            // 渲染所有音符
+            try {
+                const displayNotes = allNotes.slice(-MAX_NOTES);
+                const noteCount = displayNotes.length;
+                
+                // 固定宽度重绘五线谱
+                drawStave();
+                
+                // 用 GhostNote 填充剩余位置，保持间距一致
+                const paddedNotes = [...displayNotes];
+                for (let i = noteCount; i < MAX_NOTES; i++) {
+                    paddedNotes.push(new GhostNote({ duration: "q" }));
+                }
+                
+                const voice = new Voice({ num_beats: MAX_NOTES, beat_value: 4 });
+                voice.setStrict(false);
+                voice.addTickables(paddedNotes);
+                
+                const formatWidth = MAX_NOTES * NOTE_WIDTH;
+                new Formatter().joinVoices([voice]).format([voice], formatWidth);
+                voice.draw(context, stave);
+
+                // 绘制音名标签
+                if (showNoteNames) {
+                    const displayMidis = [];
+                    // 历史音符
+                    historyNotes.forEach(chord => {
+                        if (chord && chord.length > 0) displayMidis.push(chord);
+                    });
+                    // 当前音符
+                    if (activeNotes.size > 0) displayMidis.push(Array.from(activeNotes));
+                    const sliced = displayMidis.slice(-MAX_NOTES);
+                    drawNoteLabels(displayNotes, sliced);
+                }
+            } catch (e) {
+                console.error("VexFlow 渲染致命错误: ", e);
+            }
+        }
+
+        // 辅助记录日志
+        function log(msg) {
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            logEl.prepend(div);
+        }
+
+        // MIDI 快捷键: C2=36, D2=38, F#2=42, A#2=46, C#/3=49
+        const MIDI_SHORTCUT_TOGGLE = 36;  // C2
+        const MIDI_SHORTCUT_SONG = 38;   // D2
+        const MIDI_SHORTCUT_NAMES = 42;    // F#2
+        const MIDI_SHORTCUT_RESTART = 46; // A#2
+        const MIDI_SHORTCUT_SEGMENT_RESTART = 49; // C#/3
+
+        // 处理 MIDI 消息
+        function onMIDIMessage(event) {
+            const [status, data1, data2] = event.data;
+            const type = status & 0xf0;
+            const note = data1;
+            const velocity = data2;
+
+            if (type === 0x90 && velocity > 0) { // Note On
+                currentNoteEl.textContent = midiToNoteName(note);
+                log(`按下: ${midiToNoteName(note)} (${note})`);
+
+                // 快捷键处理
+                if (note === MIDI_SHORTCUT_TOGGLE) {
+                    log(`快捷键: 开始/结束练习`);
+                    togglePractice();
+                    return;
+                }
+                if (note === MIDI_SHORTCUT_RESTART) {
+                    log(`快捷键: 重新开始`);
+                    if (songMode) {
+                        restartSong();
+                    } else {
+                        restartPractice();
+                    }
+                    return;
+                }
+                if (note === MIDI_SHORTCUT_SEGMENT_RESTART) {
+                    log(`快捷键: 重新开始本段`);
+                    if (songMode) {
+                        restartSongSegment();
+                    }
+                    return;
+                }
+                if (note === MIDI_SHORTCUT_NAMES) {
+                    log(`快捷键: ${showNoteNames ? '隐藏' : '显示'}音名`);
+                    toggleNoteNames();
+                    return;
+                }
+                if (note === MIDI_SHORTCUT_SONG) {
+                    log(`快捷键: 歌曲模式`);
+                    toggleSongMode();
+                    return;
+                }
+
+                if (songMode) {
+                    handleSongInput(note);
+                    return;
+                }
+
+                if (practiceMode) {
+                    handlePracticeInput(note);
+                    return;
+                }
+
+                if (!activeNotes.has(note)) {
+                    activeNotes.add(note);
+                }
+            } else if (type === 0x80 || (type === 0x90 && velocity === 0)) { // Note Off
+                if (practiceMode || songMode) return;
+
+                if (activeNotes.has(note)) {
+                    historyNotes.push(Array.from(activeNotes));
+                    activeNotes.delete(note);
+                    log(`释放: ${midiToNoteName(note)}`);
+                }
+            }
+
+            updateStaff();
+        }
+
+        // 练习模式：处理输入
+        function handlePracticeInput(midi) {
+            // 如果已完成，任意按键开始新一局
+            if (practiceComplete) {
+                startNewRound();
+                return;
+            }
+
+            // 第一次输入时记录开始时间
+            if (practiceStartTime === null) {
+                practiceStartTime = Date.now();
+            }
+
+            const target = practiceNotes[practiceIndex];
+            if (midi === target) {
+                practiceResults[practiceIndex] = 'correct';
+                practiceInputs[practiceIndex] = midi;
+                log(`✓ 正确: ${midiToNoteName(midi)}`);
+            } else {
+                practiceResults[practiceIndex] = 'wrong';
+                practiceInputs[practiceIndex] = midi;
+                log(`✗ 错误: 期望 ${midiToNoteName(target)}，输入 ${midiToNoteName(midi)}`);
+            }
+
+            practiceIndex++;
+
+            const correctCount = practiceResults.filter(r => r === 'correct').length;
+            const answeredCount = practiceResults.filter(r => r !== null).length;
+            practiceInfoEl.textContent = `进度: ${answeredCount} / ${MAX_NOTES}  |  正确: ${correctCount}`;
+
+            if (practiceIndex >= MAX_NOTES) {
+                practiceComplete = true;
+                const elapsed = ((Date.now() - practiceStartTime) / 1000).toFixed(1);
+                practiceInfoEl.textContent += `  ✓ 完成！用时: ${elapsed}s  按任意键开始新一局`;
+            }
+
+            renderPractice();
+        }
+
+        // 请求 MIDI 权限
+        if (navigator.requestMIDIAccess) {
+            navigator.requestMIDIAccess().then(access => {
+                statusEl.textContent = "已连接";
+                for (let input of access.inputs.values()) {
+                    input.onmidimessage = onMIDIMessage;
+                }
+            }, () => {
+                statusEl.textContent = "访问被拒绝";
+            });
+        } else {
+            statusEl.textContent = "浏览器不支持 Web MIDI";
+        }
+
+        initStaff();
+    </script>
+</body>
+</html>
