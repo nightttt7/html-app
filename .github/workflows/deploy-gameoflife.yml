@@ -21,19 +21,40 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Verify Cloudflare API token
+      - name: Check Cloudflare secret presence
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${CLOUDFLARE_API_TOKEN}" ]; then
+            echo "CLOUDFLARE_API_TOKEN is empty in this workflow run."
+            exit 1
+          fi
+
+          if [ -z "${CLOUDFLARE_ACCOUNT_ID}" ]; then
+            echo "CLOUDFLARE_ACCOUNT_ID is empty in this workflow run."
+            exit 1
+          fi
+
+          echo "CLOUDFLARE_API_TOKEN length: ${#CLOUDFLARE_API_TOKEN}"
+          echo "CLOUDFLARE_ACCOUNT_ID length: ${#CLOUDFLARE_ACCOUNT_ID}"
+
+      - name: Verify Cloudflare account API token
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
 
           verify_status=$(curl -sS -o cf-token-verify.json -w "%{http_code}" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json" \
-            "https://api.cloudflare.com/client/v4/user/tokens/verify")
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/tokens/verify")
 
           if [ "${verify_status}" != "200" ]; then
-            echo "Cloudflare API token verification failed. Recreate CLOUDFLARE_API_TOKEN in GitHub Secrets and make sure it is an active API token, not an email or Global API Key."
+            echo "Cloudflare account API token verification failed. Confirm CLOUDFLARE_API_TOKEN is an active account-owned API token for the same CLOUDFLARE_ACCOUNT_ID."
             cat cf-token-verify.json
             exit 1
           fi
