@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  deployments: write
 
 jobs:
   deploy:
@@ -80,21 +81,20 @@ jobs:
           fi
 
           if [ "${status_code}" != "404" ]; then
-            echo "Failed to check Cloudflare Pages project ${PROJECT_NAME}. If the token is valid, then CLOUDFLARE_ACCOUNT_ID may not belong to the same Cloudflare account allowed by the token, or the token does not have Cloudflare Pages Edit permission on that account."
+            echo "Failed to check Cloudflare Pages project ${PROJECT_NAME}."
             cat cf-project.json
             exit 1
           fi
 
           echo "Creating Cloudflare Pages project ${PROJECT_NAME}."
 
-          curl -sS -o cf-create.json -w "%{http_code}" \
+          create_status=$(curl -sS -o cf-create.json -w "%{http_code}" \
             -X POST \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json" \
             --data '{"name":"'"${PROJECT_NAME}"'","production_branch":"main"}' \
-            "${create_url}" > cf-create-status.txt
+            "${create_url}")
 
-          create_status=$(cat cf-create-status.txt)
           if [ "${create_status}" != "200" ] && [ "${create_status}" != "201" ]; then
             echo "Failed to create Cloudflare Pages project ${PROJECT_NAME}."
             cat cf-create.json
@@ -107,3 +107,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy gameoflife --project-name=${{ env.PROJECT_NAME }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
