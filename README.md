@@ -11,6 +11,7 @@ Each deployed app is expected to be available at:
 Examples:
 
 - `gameoflife` -> `https://gameoflife.nightttt7.workers.dev`
+- `picture-word-match` -> `https://picture-word-match.nightttt7.workers.dev`
 - `staff` -> `https://staff.nightttt7.workers.dev`
 
 ## How automatic deployment works
