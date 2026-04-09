@@ -1,0 +1,6 @@
+{
+  "compatibilityDate": "2026-04-09",
+  "workersDev": true,
+  "workersDevSubdomain": "nightttt7.workers.dev",
+  "notFoundHandling": "single-page-application"
+}
