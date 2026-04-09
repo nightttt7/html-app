@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Picture Word Match</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --page-bg: #f6efe1;
+            --panel-bg: rgba(255, 251, 243, 0.86);
+            --card-bg: rgba(255, 253, 249, 0.9);
+            --card-border: rgba(29, 38, 44, 0.12);
+            --ink: #1d262c;
+            --muted: #5e6a73;
+            --accent: #0f766e;
+            --accent-soft: rgba(15, 118, 110, 0.14);
+            --accent-strong: #0b5c56;
+            --success: #1d8f43;
+            --success-bg: rgba(29, 143, 67, 0.14);
+            --warning: #d15834;
+            --shadow: 0 18px 48px rgba(44, 35, 17, 0.14);
+            --radius-lg: 28px;
+            --radius-md: 20px;
+            --radius-sm: 14px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Manrope", sans-serif;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at top left, rgba(255, 186, 73, 0.34), transparent 30%),
+                radial-gradient(circle at 85% 15%, rgba(68, 164, 151, 0.28), transparent 24%),
+                linear-gradient(180deg, #fbf5ea 0%, #f4ead7 100%);
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body::before {
+            background-image:
+                linear-gradient(rgba(29, 38, 44, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(29, 38, 44, 0.03) 1px, transparent 1px);
+            background-size: 28px 28px;
+            mask-image: radial-gradient(circle at center, black 35%, transparent 80%);
+        }
+
+        body::after {
+            background: radial-gradient(circle at center, transparent 0, transparent 58%, rgba(44, 35, 17, 0.1) 100%);
+        }
+
+        .page {
+            width: min(1180px, calc(100% - 32px));
+            margin: 28px auto;
+            padding: 28px;
+            border: 1px solid rgba(29, 38, 44, 0.08);
+            border-radius: 36px;
+            background: var(--panel-bg);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+        }
+
+        .hero {
+            display: grid;
+            gap: 14px;
+            margin-bottom: 26px;
+        }
+
+        .eyebrow {
+            margin: 0;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent-strong);
+        }
+
+        h1 {
+            margin: 0;
+            font-family: "Fraunces", serif;
+            font-size: clamp(2.6rem, 6vw, 4.5rem);
+            line-height: 0.95;
+            letter-spacing: -0.04em;
+        }
+
+        .subtitle {
+            max-width: 60ch;
+            margin: 0;
+            color: var(--muted);
+            font-size: 1.04rem;
+            line-height: 1.7;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .pill,
+        .reset-button {
+            border-radius: 999px;
+            padding: 10px 16px;
+            font-size: 0.94rem;
+        }
+
+        .pill {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(29, 38, 44, 0.08);
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .reset-button {
+            border: 0;
+            background: var(--ink);
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 180ms ease, background 180ms ease;
+        }
+
+        .reset-button:hover {
+            transform: translateY(-1px);
+            background: #0d1418;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.75fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel {
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(29, 38, 44, 0.08);
+            background: rgba(255, 255, 255, 0.52);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+        }
+
+        .picture-panel {
+            padding: 24px;
+        }
+
+        .panel-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .panel-heading h2,
+        .word-panel h2 {
+            margin: 0;
+            font-family: "Fraunces", serif;
+            font-size: 1.65rem;
+        }
+
+        .panel-heading p,
+        .word-panel p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .picture-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .drop-card {
+            position: relative;
+            display: grid;
+            gap: 12px;
+            min-height: 250px;
+            padding: 18px;
+            border-radius: var(--radius-md);
+            background: var(--card-bg);
+            border: 2px dashed rgba(29, 38, 44, 0.12);
+            transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+        }
+
+        .drop-card::before {
+            content: "";
+            position: absolute;
+            inset: -12px;
+            border-radius: calc(var(--radius-md) + 12px);
+            border: 1px dashed transparent;
+            pointer-events: none;
+        }
+
+        .drop-card.hovered {
+            transform: translateY(-3px) rotate(-0.4deg);
+            border-color: rgba(15, 118, 110, 0.35);
+            box-shadow: 0 16px 28px rgba(15, 118, 110, 0.12);
+            background: rgba(237, 250, 248, 0.9);
+        }
+
+        .drop-card.hovered::before {
+            border-color: rgba(15, 118, 110, 0.24);
+        }
+
+        .drop-card.matched {
+            border-color: rgba(29, 143, 67, 0.22);
+            background: rgba(246, 255, 248, 0.94);
+        }
+
+        .image-frame {
+            display: grid;
+            place-items: center;
+            min-height: 150px;
+            padding: 16px;
+            border-radius: 18px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(250, 243, 231, 0.9)),
+                linear-gradient(135deg, rgba(255, 213, 135, 0.18), rgba(96, 185, 174, 0.12));
+            overflow: hidden;
+        }
+
+        .image-frame svg {
+            width: 100%;
+            max-width: 220px;
+            height: auto;
+            display: block;
+        }
+
+        .image-caption {
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #8e978d;
+        }
+
+        .answer-slot {
+            min-height: 50px;
+            display: grid;
+            place-items: center;
+            border-radius: 16px;
+            padding: 10px 12px;
+            border: 1px dashed rgba(15, 118, 110, 0.18);
+            background: rgba(15, 118, 110, 0.05);
+            text-align: center;
+        }
+
+        .slot-hint {
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .answer-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 9px 14px;
+            border-radius: 999px;
+            font-weight: 800;
+            color: var(--success);
+            background: var(--success-bg);
+            border: 1px solid rgba(29, 143, 67, 0.18);
+            box-shadow: 0 8px 18px rgba(29, 143, 67, 0.08);
+        }
+
+        .word-panel {
+            padding: 24px;
+            position: sticky;
+            top: 20px;
+        }
+
+        .bank-copy {
+            margin-top: 6px;
+        }
+
+        .word-bank {
+            display: grid;
+            gap: 14px;
+            margin-top: 20px;
+        }
+
+        .word-chip {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 16px 18px;
+            border-radius: 18px;
+            border: 1px solid rgba(29, 38, 44, 0.1);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(247, 244, 236, 0.95));
+            box-shadow: 0 12px 26px rgba(35, 28, 16, 0.08);
+            font: inherit;
+            font-size: 1rem;
+            font-weight: 800;
+            text-align: left;
+            color: var(--ink);
+            cursor: grab;
+            touch-action: none;
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        .word-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 28px rgba(35, 28, 16, 0.12);
+        }
+
+        .word-chip::after {
+            content: "Drag";
+            flex-shrink: 0;
+            font-size: 0.77rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-strong);
+        }
+
+        .word-chip.is-origin {
+            opacity: 0.2;
+            transform: scale(0.98);
+        }
+
+        .word-chip[disabled] {
+            cursor: default;
+        }
+
+        .bank-note {
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(15, 118, 110, 0.08);
+            color: var(--accent-strong);
+            font-size: 0.94rem;
+        }
+
+        .status-banner {
+            margin: 24px 0 0;
+            padding: 16px 18px;
+            border-radius: 18px;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--ink);
+            background: rgba(255, 255, 255, 0.72);
+            border: 1px solid rgba(29, 38, 44, 0.08);
+        }
+
+        .status-banner.success {
+            color: var(--success);
+            background: rgba(29, 143, 67, 0.1);
+            border-color: rgba(29, 143, 67, 0.18);
+        }
+
+        .drag-ghost {
+            position: fixed;
+            left: 0;
+            top: 0;
+            margin: 0;
+            z-index: 999;
+            pointer-events: none;
+            transform: rotate(-3deg);
+            cursor: grabbing;
+        }
+
+        .empty-bank {
+            padding: 20px 18px;
+            border-radius: 18px;
+            border: 1px dashed rgba(29, 143, 67, 0.2);
+            background: rgba(29, 143, 67, 0.06);
+            color: var(--success);
+            font-weight: 800;
+            text-align: center;
+        }
+
+        @media (max-width: 980px) {
+            .board {
+                grid-template-columns: 1fr;
+            }
+
+            .word-panel {
+                position: static;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .page {
+                width: min(100% - 16px, 1000px);
+                margin: 12px auto;
+                padding: 18px;
+                border-radius: 28px;
+            }
+
+            .picture-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-heading {
+                flex-direction: column;
+                align-items: start;
+            }
+
+            .word-chip {
+                padding: 14px 16px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 1ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 1ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <header class="hero">
+            <p class="eyebrow">English Matching Demo</p>
+            <h1>Picture Word Match</h1>
+            <p class="subtitle">Drag each English phrase onto the matching picture. A wrong drop snaps back. A correct drop locks the phrase under the picture in green.</p>
+            <div class="hero-meta">
+                <div class="pill" id="progress-pill">0 / 5 matched</div>
+                <button class="reset-button" id="reset-button" type="button">Reset Round</button>
+            </div>
+        </header>
+
+        <section class="board" aria-label="Matching board">
+            <section class="panel picture-panel" aria-labelledby="pictures-title">
+                <div class="panel-heading">
+                    <div>
+                        <h2 id="pictures-title">Picture Board</h2>
+                        <p>Drop each phrase onto the right frame. The target area is slightly larger than the visible card.</p>
+                    </div>
+                </div>
+                <div class="picture-grid" id="picture-grid"></div>
+            </section>
+
+            <aside class="panel word-panel" aria-labelledby="words-title">
+                <h2 id="words-title">Word Bank</h2>
+                <p class="bank-copy">Pick up a phrase and move it to the matching picture.</p>
+                <div class="word-bank" id="word-bank"></div>
+                <p class="bank-note">Wrong match: the phrase returns to the bank. Correct match: it locks in below the picture.</p>
+            </aside>
+        </section>
+
+        <p class="status-banner" id="status-banner" aria-live="polite">Match all five pairs.</p>
+    </main>
+
+    <script>
+        const cards = [
+            {
+                id: "yellow-balloon",
+                label: "Yellow Balloon",
+                caption: "Picture 1",
+                svg: `
+                    <svg viewBox="0 0 220 180" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="balloonGlow" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#ffe17d"></stop>
+                                <stop offset="100%" stop-color="#f4b233"></stop>
+                            </linearGradient>
+                        </defs>
+                        <ellipse cx="110" cy="68" rx="43" ry="54" fill="url(#balloonGlow)"></ellipse>
+                        <ellipse cx="97" cy="54" rx="12" ry="18" fill="rgba(255,255,255,0.45)"></ellipse>
+                        <polygon points="108,120 118,120 113,132" fill="#d18d1f"></polygon>
+                        <path d="M113 132 C116 146, 94 150, 98 160 C102 168, 121 165, 118 175" fill="none" stroke="#605447" stroke-width="4" stroke-linecap="round"></path>
+                        <circle cx="37" cy="37" r="10" fill="rgba(255, 214, 111, 0.45)"></circle>
+                    </svg>`
+            },
+            {
+                id: "blue-fish",
+                label: "Blue Fish",
+                caption: "Picture 2",
+                svg: `
+                    <svg viewBox="0 0 220 180" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="fishBody" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#75d0ee"></stop>
+                                <stop offset="100%" stop-color="#1679a7"></stop>
+                            </linearGradient>
+                        </defs>
+                        <path d="M42 92 C62 46, 150 38, 176 92 C148 145, 62 138, 42 92 Z" fill="url(#fishBody)"></path>
+                        <polygon points="174,92 205,63 206,121" fill="#0f658d"></polygon>
+                        <circle cx="85" cy="84" r="7" fill="#112026"></circle>
+                        <circle cx="83" cy="82" r="2.4" fill="#ffffff"></circle>
+                        <path d="M108 100 C123 112, 143 112, 155 96" fill="none" stroke="#e8f6fb" stroke-width="6" stroke-linecap="round"></path>
+                        <path d="M93 59 L123 43 L126 74" fill="#89d9f2"></path>
+                        <path d="M97 124 L127 111 L122 140" fill="#89d9f2"></path>
+                    </svg>`
+            },
+            {
+                id: "red-apple",
+                label: "Red Apple",
+                caption: "Picture 3",
+                svg: `
+                    <svg viewBox="0 0 220 180" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="appleSkin" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#ff8b7a"></stop>
+                                <stop offset="100%" stop-color="#cf3f2f"></stop>
+                            </linearGradient>
+                        </defs>
+                        <path d="M111 49 C89 31, 61 53, 61 88 C61 130, 83 151, 110 151 C137 151, 159 130, 159 88 C159 54, 132 31, 111 49 Z" fill="url(#appleSkin)"></path>
+                        <path d="M113 50 C130 22, 124 11, 112 8" fill="none" stroke="#5f3d24" stroke-width="6" stroke-linecap="round"></path>
+                        <path d="M118 24 C142 10, 161 17, 164 38 C145 43, 126 40, 118 24 Z" fill="#4d9d48"></path>
+                        <ellipse cx="93" cy="72" rx="10" ry="16" fill="rgba(255,255,255,0.28)"></ellipse>
+                    </svg>`
+            },
+            {
+                id: "green-leaf",
+                label: "Green Leaf",
+                caption: "Picture 4",
+                svg: `
+                    <svg viewBox="0 0 220 180" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="leafTone" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#9be278"></stop>
+                                <stop offset="100%" stop-color="#27955d"></stop>
+                            </linearGradient>
+                        </defs>
+                        <path d="M39 112 C48 43, 145 23, 181 73 C172 139, 93 165, 39 112 Z" fill="url(#leafTone)"></path>
+                        <path d="M49 110 C81 106, 118 89, 160 50" fill="none" stroke="#edf7e8" stroke-width="5" stroke-linecap="round"></path>
+                        <path d="M92 102 C85 84, 79 69, 69 56" fill="none" stroke="#edf7e8" stroke-width="4" stroke-linecap="round"></path>
+                        <path d="M115 90 C127 78, 140 64, 147 52" fill="none" stroke="#edf7e8" stroke-width="4" stroke-linecap="round"></path>
+                        <path d="M53 117 C60 142, 50 156, 42 165" fill="none" stroke="#73583d" stroke-width="5" stroke-linecap="round"></path>
+                    </svg>`
+            },
+            {
+                id: "purple-kite",
+                label: "Purple Kite",
+                caption: "Picture 5",
+                svg: `
+                    <svg viewBox="0 0 220 180" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="kiteTone" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#b58ef7"></stop>
+                                <stop offset="100%" stop-color="#6b47c8"></stop>
+                            </linearGradient>
+                        </defs>
+                        <polygon points="110,26 176,92 110,155 44,92" fill="url(#kiteTone)"></polygon>
+                        <path d="M110 26 L110 155" fill="none" stroke="#efe7ff" stroke-width="5"></path>
+                        <path d="M44 92 L176 92" fill="none" stroke="#efe7ff" stroke-width="5"></path>
+                        <path d="M110 155 C112 167, 135 166, 137 178" fill="none" stroke="#6a533f" stroke-width="4" stroke-linecap="round"></path>
+                        <circle cx="138" cy="177" r="4" fill="#ffb84f"></circle>
+                        <circle cx="149" cy="188" r="4" fill="#ff7b5c"></circle>
+                        <circle cx="159" cy="199" r="4" fill="#4ebc9a"></circle>
+                    </svg>`
+            }
+        ];
+
+        const pictureGrid = document.getElementById("picture-grid");
+        const wordBank = document.getElementById("word-bank");
+        const statusBanner = document.getElementById("status-banner");
+        const progressPill = document.getElementById("progress-pill");
+        const resetButton = document.getElementById("reset-button");
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        const labelMap = new Map(cards.map((card) => [card.id, card.label]));
+
+        let wordOrder = [];
+        let matchedIds = new Set();
+        let activeDrag = null;
+
+        function shuffle(items) {
+            const copy = [...items];
+            for (let index = copy.length - 1; index > 0; index -= 1) {
+                const swapIndex = Math.floor(Math.random() * (index + 1));
+                [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+            }
+            return copy;
+        }
+
+        function renderPictures() {
+            pictureGrid.innerHTML = cards.map((card) => {
+                const matched = matchedIds.has(card.id);
+                return `
+                    <article class="drop-card ${matched ? "matched" : ""}" data-id="${card.id}">
+                        <div class="image-frame">${card.svg}</div>
+                        <div class="image-caption">${card.caption}</div>
+                        <div class="answer-slot">
+                            ${matched ? `<span class="answer-chip">${card.label}</span>` : `<span class="slot-hint">Drop the matching phrase here</span>`}
+                        </div>
+                    </article>`;
+            }).join("");
+        }
+
+        function renderWords() {
+            const availableWords = wordOrder.filter((id) => !matchedIds.has(id));
+            if (availableWords.length === 0) {
+                wordBank.innerHTML = '<div class="empty-bank">No phrases left. Everything is matched.</div>';
+                return;
+            }
+
+            wordBank.innerHTML = availableWords.map((id) => `
+                <button class="word-chip" type="button" data-id="${id}">
+                    <span>${labelMap.get(id)}</span>
+                </button>`).join("");
+        }
+
+        function updateStatus(message, isSuccess = false) {
+            statusBanner.textContent = message;
+            statusBanner.classList.toggle("success", isSuccess);
+            progressPill.textContent = `${matchedIds.size} / ${cards.length} matched`;
+        }
+
+        function render() {
+            renderPictures();
+            renderWords();
+            if (matchedIds.size === cards.length) {
+                updateStatus("All correct!", true);
+            } else if (matchedIds.size === 0) {
+                updateStatus("Match all five pairs.");
+            } else {
+                updateStatus(`Keep going. ${cards.length - matchedIds.size} phrase${cards.length - matchedIds.size === 1 ? "" : "s"} left.`);
+            }
+        }
+
+        function resetRound() {
+            matchedIds = new Set();
+            wordOrder = shuffle(cards.map((card) => card.id));
+            cleanupDrag(true);
+            render();
+        }
+
+        function expandRect(rect, padding) {
+            return {
+                left: rect.left - padding,
+                top: rect.top - padding,
+                right: rect.right + padding,
+                bottom: rect.bottom + padding
+            };
+        }
+
+        function findDropTarget(clientX, clientY) {
+            const candidates = Array.from(document.querySelectorAll(".drop-card:not(.matched)"));
+            return candidates.find((card) => {
+                const rect = expandRect(card.getBoundingClientRect(), 18);
+                return clientX >= rect.left && clientX <= rect.right && clientY >= rect.top && clientY <= rect.bottom;
+            }) || null;
+        }
+
+        function setHoveredTarget(nextTarget) {
+            if (activeDrag?.hoveredTarget === nextTarget) {
+                return;
+            }
+
+            if (activeDrag?.hoveredTarget) {
+                activeDrag.hoveredTarget.classList.remove("hovered");
+            }
+
+            if (nextTarget) {
+                nextTarget.classList.add("hovered");
+            }
+
+            if (activeDrag) {
+                activeDrag.hoveredTarget = nextTarget;
+            }
+        }
+
+        function moveGhost(clientX, clientY) {
+            if (!activeDrag) {
+                return;
+            }
+
+            activeDrag.ghost.style.left = `${clientX - activeDrag.offsetX}px`;
+            activeDrag.ghost.style.top = `${clientY - activeDrag.offsetY}px`;
+        }
+
+        function cleanupDrag(skipAnimation = false) {
+            if (!activeDrag) {
+                return;
+            }
+
+            window.removeEventListener("pointermove", handlePointerMove);
+            window.removeEventListener("pointerup", handlePointerUp);
+            window.removeEventListener("pointercancel", handlePointerCancel);
+            setHoveredTarget(null);
+
+            if (activeDrag.chip && activeDrag.chip.isConnected) {
+                activeDrag.chip.classList.remove("is-origin");
+            }
+
+            if (activeDrag.ghost) {
+                if (skipAnimation) {
+                    activeDrag.ghost.remove();
+                }
+            }
+
+            activeDrag = null;
+        }
+
+        function finishDropAnimation(onDone) {
+            if (!activeDrag) {
+                return;
+            }
+
+            const ghost = activeDrag.ghost;
+            const done = () => {
+                ghost.removeEventListener("transitionend", done);
+                ghost.remove();
+                onDone();
+            };
+
+            if (prefersReducedMotion) {
+                done();
+                return;
+            }
+
+            ghost.addEventListener("transitionend", done, { once: true });
+        }
+
+        function animateBack() {
+            if (!activeDrag) {
+                return;
+            }
+
+            const { ghost, chip } = activeDrag;
+            const originRect = chip.getBoundingClientRect();
+            ghost.style.transition = prefersReducedMotion ? "none" : "left 220ms ease, top 220ms ease, transform 220ms ease";
+            ghost.style.left = `${originRect.left}px`;
+            ghost.style.top = `${originRect.top}px`;
+            ghost.style.transform = "rotate(0deg) scale(1)";
+
+            finishDropAnimation(() => {
+                const phrase = labelMap.get(chip.dataset.id);
+                cleanupDrag(true);
+                updateStatus(`${phrase} does not belong there. Try another picture.`);
+            });
+        }
+
+        function animateMatch(target) {
+            if (!activeDrag) {
+                return;
+            }
+
+            const { ghost, chip } = activeDrag;
+            const slot = target.querySelector(".answer-slot");
+            const slotRect = slot.getBoundingClientRect();
+            ghost.style.transition = prefersReducedMotion ? "none" : "left 220ms ease, top 220ms ease, transform 220ms ease, opacity 220ms ease";
+            ghost.style.left = `${slotRect.left}px`;
+            ghost.style.top = `${slotRect.top + (slotRect.height - ghost.offsetHeight) / 2}px`;
+            ghost.style.transform = "rotate(0deg) scale(0.98)";
+            ghost.style.opacity = "0.4";
+
+            finishDropAnimation(() => {
+                const phrase = labelMap.get(chip.dataset.id);
+                matchedIds.add(chip.dataset.id);
+                cleanupDrag(true);
+                render();
+                if (matchedIds.size === cards.length) {
+                    updateStatus("All correct!", true);
+                } else {
+                    updateStatus(`${phrase} is correct.`, true);
+                    statusBanner.classList.remove("success");
+                }
+            });
+        }
+
+        function handlePointerMove(event) {
+            if (!activeDrag) {
+                return;
+            }
+
+            moveGhost(event.clientX, event.clientY);
+            setHoveredTarget(findDropTarget(event.clientX, event.clientY));
+        }
+
+        function handlePointerUp() {
+            if (!activeDrag) {
+                return;
+            }
+
+            const { hoveredTarget, chip } = activeDrag;
+            if (hoveredTarget && hoveredTarget.dataset.id === chip.dataset.id) {
+                animateMatch(hoveredTarget);
+                return;
+            }
+
+            animateBack();
+        }
+
+        function handlePointerCancel() {
+            animateBack();
+        }
+
+        wordBank.addEventListener("pointerdown", (event) => {
+            const chip = event.target.closest(".word-chip");
+            if (!chip || activeDrag) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const rect = chip.getBoundingClientRect();
+            const ghost = chip.cloneNode(true);
+            ghost.classList.add("drag-ghost");
+            ghost.style.width = `${rect.width}px`;
+            ghost.style.height = `${rect.height}px`;
+            ghost.style.left = `${rect.left}px`;
+            ghost.style.top = `${rect.top}px`;
+            document.body.appendChild(ghost);
+
+            chip.classList.add("is-origin");
+
+            activeDrag = {
+                chip,
+                ghost,
+                hoveredTarget: null,
+                offsetX: event.clientX - rect.left,
+                offsetY: event.clientY - rect.top
+            };
+
+            moveGhost(event.clientX, event.clientY);
+            setHoveredTarget(findDropTarget(event.clientX, event.clientY));
+            window.addEventListener("pointermove", handlePointerMove);
+            window.addEventListener("pointerup", handlePointerUp);
+            window.addEventListener("pointercancel", handlePointerCancel);
+        });
+
+        resetButton.addEventListener("click", resetRound);
+
+        resetRound();
+    </script>
+</body>
+</html>
