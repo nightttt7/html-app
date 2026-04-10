@@ -655,7 +655,9 @@
     <main class="page">
         <section class="hero">
             <div class="hero-top">
-                <h1 id="heroTitle">集装箱竞拍站</h1>
+                <div>
+                    <h1 id="heroTitle">集装箱竞拍站</h1>
+                </div>
                 <div class="language-switch" role="group" aria-label="Language selector">
                     <button type="button" id="langZhButton" class="active" aria-label="Switch to Chinese">中文</button>
                     <button type="button" id="langEnButton" aria-label="Switch to English">English</button>
@@ -773,7 +775,7 @@
                 </div>
 
                 <details class="history-toggle" id="historyToggle">
-                    <summary id="historyTitle">经营记录</summary>
+                    <summary id="historyTitle" aria-expanded="false">经营记录</summary>
                     <div class="history-list" id="historyList"></div>
                 </details>
             </aside>
@@ -1035,6 +1037,7 @@
         const warehouseContent = document.getElementById("warehouseContent");
         const warehouseList = document.getElementById("warehouseList");
         const warehouseSummary = document.getElementById("warehouseSummary");
+        const historyToggle = document.getElementById("historyToggle");
         const historyTitle = document.getElementById("historyTitle");
         const historyList = document.getElementById("historyList");
         const messageBox = document.getElementById("messageBox");
@@ -1328,8 +1331,8 @@
                 });
             }
 
-            appliedRewardsValue.textContent = String(state.activeBonuses.length);
-            pendingRewardsValue.textContent = String(pending.length);
+            appliedRewardsValue.textContent = state.activeBonuses.length;
+            pendingRewardsValue.textContent = pending.length;
 
             renderRewardBubble(
                 appliedRewardsButton,
@@ -1826,7 +1829,6 @@
         appliedRewardsButton.addEventListener("click", (event) => {
             event.stopPropagation();
             const shouldOpen = appliedRewardsBubble.hidden;
-            appliedRewardsBubble.hidden = true;
             pendingRewardsBubble.hidden = true;
             appliedRewardsBubble.hidden = !shouldOpen;
             appliedRewardsButton.setAttribute("aria-expanded", String(shouldOpen));
@@ -1836,10 +1838,12 @@
             event.stopPropagation();
             const shouldOpen = pendingRewardsBubble.hidden;
             appliedRewardsBubble.hidden = true;
-            pendingRewardsBubble.hidden = true;
             pendingRewardsBubble.hidden = !shouldOpen;
             pendingRewardsButton.setAttribute("aria-expanded", String(shouldOpen));
             appliedRewardsButton.setAttribute("aria-expanded", "false");
+        });
+        historyToggle.addEventListener("toggle", () => {
+            historyTitle.setAttribute("aria-expanded", String(historyToggle.open));
         });
         document.addEventListener("click", () => {
             appliedRewardsBubble.hidden = true;
