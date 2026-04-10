@@ -19,6 +19,7 @@
             --danger: #fb7185;
             --shadow: 0 24px 48px rgba(15, 23, 42, 0.35);
             --radius: 24px;
+            --floating-action-clearance: 110px;
         }
 
         * {
@@ -39,7 +40,7 @@
         .page {
             width: min(1180px, calc(100% - 32px));
             margin: 24px auto;
-            padding: 28px 28px 110px;
+            padding: 28px 28px var(--floating-action-clearance);
             border: 1px solid rgba(148, 163, 184, 0.16);
             border-radius: 32px;
             background: rgba(2, 6, 23, 0.7);
@@ -453,9 +454,9 @@
 
         @media (max-width: 768px) {
             .page {
-                width: min(100% - 12px, 100%);
+                width: calc(100% - 12px);
                 margin: 12px auto;
-                padding: 18px 14px 110px;
+                padding: 18px 14px var(--floating-action-clearance);
                 border-radius: 24px;
             }
 
@@ -1188,7 +1189,7 @@
             roundValue.textContent = state.round;
             licenseValue.textContent = formatMoney(getDiscountedLicenseFee());
             mobileCashValue.textContent = formatMoney(state.cash);
-            mobileRoundValue.textContent = localize(`第${state.round}天`, `D${state.round}`);
+            mobileRoundValue.textContent = localize(`第 ${state.round} 天`, `D${state.round}`);
             mobileLicenseValue.textContent = formatMoney(getDiscountedLicenseFee());
         }
 
