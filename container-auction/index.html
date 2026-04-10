@@ -5,21 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>集装箱竞拍站</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Manrope:wght@400;500;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap');
+
         :root {
-            --bg: #0f172a;
-            --panel: rgba(15, 23, 42, 0.82);
-            --panel-soft: rgba(30, 41, 59, 0.82);
-            --card: rgba(255, 255, 255, 0.08);
-            --line: rgba(148, 163, 184, 0.36);
-            --text: #e2e8f0;
-            --muted: #94a3b8;
-            --accent: #f59e0b;
-            --accent-strong: #f97316;
-            --success: #22c55e;
-            --danger: #fb7185;
-            --shadow: 0 24px 48px rgba(15, 23, 42, 0.35);
-            --radius: 24px;
-            --floating-action-clearance: 110px;
+            --bg: #f2e7d2;
+            --bg-deep: #173e46;
+            --panel: rgba(255, 247, 234, 0.86);
+            --panel-soft: rgba(255, 251, 243, 0.94);
+            --card: rgba(255, 252, 246, 0.96);
+            --line: rgba(25, 55, 61, 0.14);
+            --text: #1e2629;
+            --muted: #657276;
+            --accent: #d85d2f;
+            --accent-strong: #9f381d;
+            --accent-cool: #1f7a74;
+            --signal: #e6b34f;
+            --success: #1d7b60;
+            --danger: #b94739;
+            --shadow: 0 24px 60px rgba(69, 57, 34, 0.18);
+            --radius: 26px;
+            --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+            --display: "Fraunces", Georgia, serif;
+            --body: "Manrope", "Segoe UI", sans-serif;
+            --floating-action-clearance: 120px;
+            --status-header-height: 182px;
         }
 
         * {
@@ -29,37 +38,73 @@
         body {
             margin: 0;
             min-height: 100vh;
-            font-family: Arial, Helvetica, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            position: relative;
+            font-family: var(--body);
             color: var(--text);
             background:
-                radial-gradient(circle at top, rgba(249, 115, 22, 0.24), transparent 24%),
-                radial-gradient(circle at 80% 15%, rgba(34, 197, 94, 0.2), transparent 20%),
-                linear-gradient(180deg, #020617 0%, #0f172a 100%);
+                radial-gradient(circle at 12% 18%, rgba(144, 185, 176, 0.18), transparent 24%),
+                radial-gradient(circle at 88% 16%, rgba(216, 93, 47, 0.14), transparent 20%),
+                linear-gradient(180deg, #dbe7e1 0%, #efe0c7 34%, #f7f0e5 100%);
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            background:
+                repeating-linear-gradient(135deg, rgba(216, 93, 47, 0.06) 0 2px, transparent 2px 28px),
+                linear-gradient(90deg, rgba(89, 129, 122, 0.05), transparent 18%, transparent 82%, rgba(89, 129, 122, 0.05));
+            opacity: 0.58;
+        }
+
+        body::after {
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.55), transparent 22%),
+                radial-gradient(circle at 80% 0%, rgba(255, 255, 255, 0.28), transparent 24%);
+            mix-blend-mode: soft-light;
         }
 
         .page {
-            width: min(1180px, calc(100% - 32px));
-            margin: 24px auto;
-            padding: 28px 28px var(--floating-action-clearance);
-            border: 1px solid rgba(148, 163, 184, 0.16);
-            border-radius: 32px;
-            background: rgba(2, 6, 23, 0.7);
+            width: min(520px, calc(100% - 12px));
+            margin: 12px auto;
+            padding: 18px 14px var(--floating-action-clearance);
+            position: relative;
+            border: 1px solid rgba(23, 62, 70, 0.1);
+            border-radius: 28px;
+            background: linear-gradient(180deg, rgba(255, 249, 239, 0.92), rgba(248, 238, 221, 0.94));
             box-shadow: var(--shadow);
-            backdrop-filter: blur(14px);
+        }
+
+        .page::before {
+            content: "";
+            position: absolute;
+            inset: 10px;
+            border: 1px dashed rgba(31, 122, 116, 0.16);
+            border-radius: 20px;
+            pointer-events: none;
         }
 
         .hero {
             display: grid;
-            gap: 16px;
-            margin-bottom: 24px;
+            gap: 14px;
+            margin-bottom: 18px;
+            padding-top: calc(var(--status-header-height) + 10px);
         }
 
         .hero-top {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            align-items: flex-start;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: start;
+        }
+
+        .hero-brand {
+            min-width: 0;
         }
 
         .eyebrow {
@@ -73,15 +118,20 @@
 
         h1 {
             margin: 0;
-            font-size: clamp(2.2rem, 5vw, 4rem);
-            line-height: 0.95;
+            font-size: clamp(1.55rem, 5.8vw, 2.25rem);
+            line-height: 1;
+            font-family: var(--display);
+            letter-spacing: -0.03em;
+            color: #14353b;
         }
 
         .subtitle {
             max-width: 70ch;
             margin: 0;
             color: var(--muted);
-            line-height: 1.7;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            max-width: 58ch;
         }
 
         .language-switch {
@@ -89,68 +139,70 @@
             gap: 4px;
             padding: 4px;
             border-radius: 999px;
-            border: 1px solid rgba(148, 163, 184, 0.48);
-            background: rgba(15, 23, 42, 0.55);
+            border: 1px solid rgba(23, 62, 70, 0.16);
+            background: rgba(250, 242, 228, 0.92);
+            box-shadow: 0 10px 24px rgba(58, 51, 34, 0.08);
+            justify-self: end;
+            align-self: start;
+            white-space: nowrap;
         }
 
         .language-switch button {
             padding: 8px 12px;
             background: transparent;
-            color: var(--muted);
+            color: #5c6a6d;
         }
 
         .language-switch button.active {
             background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-            color: #1c1917;
+            color: #fff6ec;
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(6, minmax(0, 1fr));
-            gap: 14px;
-            margin: 24px 0;
-            padding: 14px;
-            background: #0b1120;
-            border-radius: var(--radius);
-            border: 1px solid rgba(148, 163, 184, 0.42);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        .status-header {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: min(492px, calc(100% - 40px));
+            z-index: 50;
+            overflow: visible;
+            margin-bottom: 18px;
+            padding: 10px;
+            border-radius: 22px;
+            border: 1px solid rgba(62, 109, 108, 0.14);
+            background: linear-gradient(135deg, rgba(234, 243, 238, 0.98), rgba(194, 223, 216, 0.96));
+            box-shadow: 0 18px 32px rgba(81, 91, 79, 0.12);
+            backdrop-filter: blur(12px);
         }
 
-        .mobile-status {
+        .status-scroll {
+            overflow: visible;
+            scrollbar-width: none;
+        }
+
+        .status-scroll::-webkit-scrollbar {
             display: none;
         }
 
-        .mobile-status-grid {
+        .status-stack {
+            min-width: 372px;
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 8px;
         }
 
-        .mobile-chip {
-            padding: 10px 12px;
-            border-radius: 18px;
-            border: 1px solid rgba(148, 163, 184, 0.28);
-            background: #0b1120;
-            box-shadow: 0 4px 12px rgba(2, 6, 23, 0.55);
+        .status-row {
+            display: grid;
+            gap: 8px;
         }
 
-        .mobile-chip span {
-            display: block;
-            margin-bottom: 6px;
-            color: var(--muted);
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
+        .status-row-top {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
-        .mobile-chip strong {
-            display: block;
-            font-size: 0.96rem;
-            line-height: 1.2;
+        .status-row-bottom {
+            grid-template-columns: repeat(4, minmax(74px, 1fr));
         }
 
-        .stat-card,
         .panel,
         .lot-card,
         .history-item,
@@ -163,41 +215,33 @@
             border-radius: var(--radius);
         }
 
-        .stat-card {
-            padding: 18px 20px;
-            background: rgba(15, 23, 42, 0.92) !important;
-            border-color: rgba(148, 163, 184, 0.42);
-        }
-
-        .status-strip {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 14px;
-        }
-
         .status-item {
             position: relative;
-            min-height: 92px;
-            padding: 16px 18px;
-            border: 1px solid rgba(148, 163, 184, 0.42);
-            border-radius: 22px;
-            background: rgba(11, 17, 32, 0.92);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            min-height: 76px;
+            padding: 12px 12px 11px;
+            border: 1px solid rgba(59, 112, 108, 0.12);
+            border-radius: 18px;
+            background: linear-gradient(180deg, rgba(255, 253, 248, 0.72), rgba(239, 247, 244, 0.62));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
         }
 
         .status-label {
             display: block;
-            margin-bottom: 10px;
-            color: var(--muted);
-            font-size: 0.84rem;
+            margin-bottom: 6px;
+            color: rgba(28, 66, 70, 0.62);
+            font-size: 0.72rem;
             font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         .status-value {
             display: block;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 800;
             line-height: 1.3;
+            font-family: var(--mono);
+            color: #17444a;
         }
 
         .status-button {
@@ -220,13 +264,32 @@
             position: absolute;
             left: 0;
             top: calc(100% + 10px);
-            z-index: 30;
-            width: min(320px, calc(100vw - 40px));
+            z-index: 80;
+            width: min(320px, calc(100vw - 32px));
             padding: 14px;
-            border: 1px solid rgba(148, 163, 184, 0.42);
+            border: 1px solid rgba(18, 58, 65, 0.18);
             border-radius: 18px;
-            background: rgba(2, 6, 23, 0.96);
-            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.42);
+            background: rgba(255, 248, 237, 0.98);
+            box-shadow: 0 22px 40px rgba(43, 41, 31, 0.18);
+        }
+
+        #rewardSection {
+            border: 0;
+            padding: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        #auctionPanel.reward-mode #auctionTitle {
+            margin-bottom: 2px;
+        }
+
+        #auctionPanel.reward-mode #rewardSection {
+            margin-top: -4px;
+        }
+
+        #auctionPanel.reward-mode #rewardGrid {
+            margin-top: 0;
         }
 
         .status-bubble[hidden] {
@@ -247,32 +310,22 @@
         .status-bubble-item {
             padding: 10px 12px;
             border-radius: 14px;
-            background: rgba(148, 163, 184, 0.1);
+            background: rgba(31, 122, 116, 0.08);
             color: var(--text);
             line-height: 1.5;
         }
 
-        .stat-label {
-            display: block;
-            color: var(--muted);
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: clamp(1.25rem, 2.8vw, 2rem);
-            font-weight: 800;
-        }
-
         .layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.95fr);
-            gap: 20px;
+            grid-template-columns: 1fr;
+            gap: 16px;
         }
 
         .panel {
-            padding: 22px;
-            background: var(--panel);
+            padding: 18px;
+            background: linear-gradient(180deg, rgba(255, 248, 236, 0.9), rgba(251, 242, 225, 0.92));
+            border-color: rgba(23, 62, 70, 0.12);
+            box-shadow: 0 14px 32px rgba(71, 59, 35, 0.08);
         }
 
         .panel h2,
@@ -301,32 +354,35 @@
             border-radius: 999px;
             font-size: 0.78rem;
             font-weight: 700;
+            border: 1px solid transparent;
         }
 
         .phase-badge,
         .lot-tag {
-            background: rgba(245, 158, 11, 0.12);
-            color: #fdba74;
+            background: rgba(216, 93, 47, 0.12);
+            border-color: rgba(216, 93, 47, 0.16);
+            color: var(--accent-strong);
         }
 
         .reward-tag {
-            background: rgba(56, 189, 248, 0.14);
-            color: #bae6fd;
+            background: rgba(31, 122, 116, 0.1);
+            border-color: rgba(31, 122, 116, 0.16);
+            color: #1b6964;
         }
 
         .market-tag.good {
-            background: rgba(34, 197, 94, 0.14);
-            color: #bbf7d0;
+            background: rgba(29, 123, 96, 0.12);
+            color: #1d7b60;
         }
 
         .market-tag.warn {
-            background: rgba(251, 113, 133, 0.14);
-            color: #fecdd3;
+            background: rgba(185, 71, 57, 0.12);
+            color: #ab4538;
         }
 
         .market-tag.neutral {
-            background: rgba(148, 163, 184, 0.16);
-            color: #e2e8f0;
+            background: rgba(23, 62, 70, 0.08);
+            color: #315057;
         }
 
         .lot-grid,
@@ -335,23 +391,39 @@
         .history-list,
         .hint-list {
             display: grid;
-            gap: 14px;
+            gap: 12px;
         }
 
         .lot-grid,
         .reward-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: 1fr;
             margin-top: 18px;
+        }
+
+        #rewardGrid {
+            margin-top: 10px;
         }
 
         .lot-card,
         .reward-card,
         .warehouse-item {
+            position: relative;
+            overflow: hidden;
             padding: 18px;
             display: grid;
             gap: 14px;
-            background: var(--panel-soft);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            background: linear-gradient(180deg, rgba(255, 252, 246, 0.98), rgba(244, 232, 210, 0.92));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 12px 24px rgba(78, 66, 42, 0.08);
+        }
+
+        .lot-card::before,
+        .reward-card::before,
+        .warehouse-item::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto;
+            height: 8px;
+            background: linear-gradient(90deg, var(--accent), var(--signal), var(--accent-cool));
         }
 
         .lot-top,
@@ -367,10 +439,23 @@
             flex-wrap: wrap;
         }
 
+        .reward-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .duration-tag {
+            background: rgba(34, 197, 94, 0.14);
+            color: #bbf7d0;
+        }
+
         .lot-name,
         .warehouse-name {
             margin: 0;
             font-size: 1.1rem;
+            font-family: var(--display);
+            letter-spacing: -0.02em;
         }
 
         .small {
@@ -382,7 +467,8 @@
         .warehouse-price {
             font-size: 1.55rem;
             font-weight: 800;
-            color: white;
+            color: #14353b;
+            font-family: var(--mono);
         }
 
         .hint-list {
@@ -404,7 +490,8 @@
         .meta-box {
             padding: 10px 12px;
             border-radius: 18px;
-            background: rgba(148, 163, 184, 0.1);
+            background: rgba(23, 62, 70, 0.06);
+            border: 1px solid rgba(23, 62, 70, 0.08);
         }
 
         button {
@@ -431,23 +518,41 @@
         .sell-button,
         .reward-button {
             background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-            color: #1c1917;
+            color: #fff8ef;
         }
 
         .ghost-button,
         .skip-button,
         .phase-button {
-            background: rgba(148, 163, 184, 0.14);
+            background: rgba(23, 62, 70, 0.08);
             color: var(--text);
-            border: 1px solid var(--line);
+            border: 1px solid rgba(23, 62, 70, 0.14);
+        }
+
+        .interactive-card {
+            cursor: pointer;
+            transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+        }
+
+        .interactive-card:hover,
+        .interactive-card:focus-visible {
+            transform: translateY(-2px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 18px 32px rgba(67, 54, 32, 0.14);
+            border-color: rgba(216, 93, 47, 0.28);
+            outline: none;
+        }
+
+        .interactive-card-disabled {
+            opacity: 0.72;
+            cursor: not-allowed;
         }
 
         .message {
             margin-top: 14px;
             padding: 14px 16px;
             border-radius: 18px;
-            background: rgba(148, 163, 184, 0.12);
-            color: #e5edf6;
+            background: rgba(23, 62, 70, 0.08);
+            color: var(--text);
             min-height: 54px;
         }
 
@@ -466,6 +571,10 @@
             color: #bae6fd;
         }
 
+        .message[hidden] {
+            display: none;
+        }
+
         .profit {
             font-weight: 800;
         }
@@ -480,7 +589,7 @@
 
         .history-item {
             padding: 14px;
-            background: rgba(15, 23, 42, 0.45);
+            background: rgba(255, 250, 242, 0.94);
         }
 
         .history-list {
@@ -504,9 +613,9 @@
             padding: 14px 16px;
             cursor: pointer;
             list-style: none;
-            border: 1px solid rgba(148, 163, 184, 0.42);
+            border: 1px solid rgba(23, 62, 70, 0.12);
             border-radius: 18px;
-            background: rgba(15, 23, 42, 0.55);
+            background: rgba(255, 249, 239, 0.96);
             font-weight: 800;
         }
 
@@ -548,10 +657,22 @@
             letter-spacing: 0.04em;
             list-style: none;
             padding: 6px 0;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
+            gap: 12px;
             user-select: none;
+        }
+
+        .rules-row-hint {
+            flex: 1;
+            text-align: right;
+            color: #5c6a6d;
+            font-size: 0.72rem;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .rules-toggle summary::-webkit-details-marker {
@@ -579,22 +700,12 @@
             z-index: 40;
             padding: 14px 20px;
             background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-            color: #1c1917;
-            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.42);
+            color: #fff8ef;
+            box-shadow: 0 20px 40px rgba(114, 53, 31, 0.24);
         }
 
         .floating-day-button[hidden] {
             display: none;
-        }
-
-        @media (max-width: 1080px) {
-            .status-strip,
-            .stats,
-            .lot-grid,
-            .reward-grid,
-            .layout {
-                grid-template-columns: 1fr;
-            }
         }
 
         @media (max-width: 768px) {
@@ -605,13 +716,17 @@
                 border-radius: 24px;
             }
 
-            .hero-top {
-                align-items: center;
+            .hero {
+                padding-top: calc(var(--status-header-height) + 6px);
             }
 
-            .subtitle {
-                font-size: 0.96rem;
-                line-height: 1.55;
+            .hero-top {
+                grid-template-columns: minmax(0, 1fr) auto;
+                align-items: start;
+            }
+
+            .rules-row-hint {
+                max-width: 56%;
             }
 
             .status-item {
@@ -622,25 +737,9 @@
                 width: 100%;
             }
 
-            .stats {
-                display: none;
-            }
-
-            .mobile-status {
-                display: block;
-                position: sticky;
-                top: 10px;
-                z-index: 25;
-                margin-bottom: 18px;
-            }
-
-            .mobile-chip {
-                padding: 8px 10px;
-                border-radius: 16px;
-            }
-
-            .mobile-chip strong {
-                font-size: 0.88rem;
+            .status-header {
+                top: 8px;
+                width: calc(100% - 24px);
             }
 
             .floating-day-button {
@@ -655,7 +754,7 @@
     <main class="page">
         <section class="hero">
             <div class="hero-top">
-                <div>
+                <div class="hero-brand">
                     <h1 id="heroTitle">集装箱竞拍站</h1>
                 </div>
                 <div class="language-switch" role="group" aria-label="Language selector">
@@ -664,101 +763,66 @@
                 </div>
             </div>
             <details class="rules-toggle" id="rulesToggle">
-                <summary id="rulesSummary">游戏说明</summary>
-                <p class="subtitle" id="heroSubtitle">按天推进：先买柜子（不能卖货），再卖货，然后结束当天（需要有足够钱支付牌照费），系统扣费后进入选奖励，奖励选好后自动进入下一天。现金达到 ¥10,000 即获胜。</p>
+                <summary>
+                    <span id="rulesSummary">游戏说明</span>
+                    <span class="rules-row-hint" id="interactionHint">通过点击卡片来买下、卖掉、选择</span>
+                </summary>
+                <p class="subtitle" id="heroSubtitle">按天推进：先买柜子（不能卖货），再卖货，然后结束当天（需要有足够钱支付牌照费），系统扣费后进入选奖励，奖励选好后自动进入下一天。现金达到 $10,000 即获胜。</p>
             </details>
-            <section class="status-strip">
-                <article class="status-item">
-                    <button class="status-button" id="appliedRewardsButton" type="button" aria-expanded="false" aria-controls="appliedRewardsBubble">
-                        <span class="status-label" id="appliedRewardsLabel">已生效奖励</span>
-                        <strong class="status-value" id="appliedRewardsValue">0</strong>
-                    </button>
-                    <div class="status-bubble" id="appliedRewardsBubble" hidden></div>
-                </article>
-                <article class="status-item">
-                    <button class="status-button" id="pendingRewardsButton" type="button" aria-expanded="false" aria-controls="pendingRewardsBubble">
-                        <span class="status-label" id="pendingRewardsLabel">待生效奖励</span>
-                        <strong class="status-value" id="pendingRewardsValue">0</strong>
-                    </button>
-                    <div class="status-bubble" id="pendingRewardsBubble" hidden></div>
-                </article>
-                <article class="status-item">
-                    <span class="status-label" id="warehouseCostLabel">仓库费用</span>
-                    <strong class="status-value" id="warehouseCostValue">¥0</strong>
-                </article>
-                <article class="status-item">
-                    <span class="status-label" id="warehouseAppraisalLabel">仓库总估价</span>
-                    <strong class="status-value" id="warehouseAppraisalValue">¥0</strong>
-                </article>
+            <section class="status-header">
+                <div class="status-scroll">
+                    <div class="status-stack">
+                        <div class="status-row status-row-top">
+                            <article class="status-item">
+                                <span class="status-label" id="netWorthLabel">总资产</span>
+                                <strong class="status-value" id="netWorthValue">$0</strong>
+                            </article>
+                            <article class="status-item">
+                                <span class="status-label" id="warehouseCostLabel">仓库费用</span>
+                                <strong class="status-value" id="warehouseCostValue">$0</strong>
+                            </article>
+                            <article class="status-item">
+                                <button class="status-button" id="appliedRewardsButton" type="button" aria-expanded="false" aria-controls="appliedRewardsBubble">
+                                    <span class="status-label" id="appliedRewardsLabel">生效奖励</span>
+                                    <strong class="status-value" id="appliedRewardsValue">0</strong>
+                                </button>
+                                <div class="status-bubble" id="appliedRewardsBubble" hidden></div>
+                            </article>
+                        </div>
+                        <div class="status-row status-row-bottom">
+                            <article class="status-item">
+                                <span class="status-label" id="cashLabel">现金</span>
+                                <strong class="status-value" id="cashValue">$0</strong>
+                            </article>
+                            <article class="status-item">
+                                <span class="status-label" id="openedLabel">库存卖价</span>
+                                <strong class="status-value" id="openedValue">$0</strong>
+                            </article>
+                            <article class="status-item">
+                                <span class="status-label" id="roundLabel">天数</span>
+                                <strong class="status-value" id="roundValue">D1</strong>
+                            </article>
+                            <article class="status-item">
+                                <span class="status-label" id="licenseLabel">牌照费用</span>
+                                <strong class="status-value" id="licenseValue">$0</strong>
+                            </article>
+                        </div>
+                    </div>
+                </div>
             </section>
         </section>
 
-        <section class="mobile-status">
-            <div class="mobile-status-grid">
-                <article class="mobile-chip">
-                    <span id="mobileCashLabel">现金</span>
-                    <strong id="mobileCashValue">¥0</strong>
-                </article>
-                <article class="mobile-chip">
-                    <span id="mobileRoundLabel">天数</span>
-                    <strong id="mobileRoundValue">D1</strong>
-                </article>
-                <article class="mobile-chip">
-                    <span id="mobileInvLabel">库存卖价</span>
-                    <strong id="mobileInvValue">¥0</strong>
-                </article>
-                <article class="mobile-chip">
-                    <span id="mobileLicenseLabel">牌照</span>
-                    <strong id="mobileLicenseValue">¥0</strong>
-                </article>
-            </div>
-        </section>
-
-        <section class="stats">
-            <article class="stat-card">
-                <span class="stat-label" id="cashLabel">当前现金</span>
-                <strong class="stat-value" id="cashValue">¥0</strong>
-            </article>
-            <article class="stat-card">
-                <span class="stat-label" id="netWorthLabel">总资产</span>
-                <strong class="stat-value" id="netWorthValue">¥0</strong>
-            </article>
-            <article class="stat-card">
-                <span class="stat-label" id="inventoryLabel">库存估价</span>
-                <strong class="stat-value" id="inventoryValue">¥0</strong>
-            </article>
-            <article class="stat-card">
-                <span class="stat-label" id="openedLabel">当日卖价</span>
-                <strong class="stat-value" id="openedValue">¥0</strong>
-            </article>
-            <article class="stat-card">
-                <span class="stat-label" id="roundLabel">当前天数</span>
-                <strong class="stat-value" id="roundValue">1</strong>
-            </article>
-            <article class="stat-card">
-                <span class="stat-label" id="licenseLabel">下轮牌照费</span>
-                <strong class="stat-value" id="licenseValue">¥0</strong>
-            </article>
-        </section>
-
         <section class="layout">
-            <section class="panel">
+            <section class="panel" id="auctionPanel">
                 <h2 id="auctionTitle">今日竞拍</h2>
-                <p id="auctionIntro">每天只能买一只柜子，或者选择不买；卖货阶段可以逐件卖；准备收工时结束今天，再挑一条额外奖励。</p>
-
-                <div class="action-row" style="margin-top: 18px;">
-                    <button class="skip-button" id="skipAuctionButton">今天不买</button>
-                </div>
-                <div class="message" id="messageBox"></div>
 
                 <div class="lot-grid" id="lotGrid"></div>
+                <div class="action-row" id="skipAuctionRow" style="margin-top: 18px;">
+                    <button class="skip-button" id="skipAuctionButton">今天不买</button>
+                </div>
+                <div class="message" id="messageBox" hidden></div>
 
                 <section class="section-block" id="rewardSection" hidden>
-                    <div class="section-head">
-                        <h3 style="margin: 0;" id="rewardTitle">额外奖励</h3>
-                        <span class="reward-tag" id="rewardLimitTag">最多选一条</span>
-                    </div>
-                    <p id="rewardIntro">奖励有的免费有的要花钱，通常会影响下一天，也可能直接给你现金。</p>
                     <div class="reward-grid" id="rewardGrid"></div>
                     <div class="action-row" style="margin-top: 14px;">
                         <button class="skip-button" id="skipRewardButton">放弃奖励</button>
@@ -769,7 +833,6 @@
             <aside class="panel">
                 <h2 id="warehouseLogTitle">仓库</h2>
                 <div id="warehouseContent">
-                    <p id="warehouseLogIntro">开出来的货物都会进自己的仓库；你可以今天逐件卖，也可以付比较便宜的仓储费等以后更好的价格。</p>
                     <div class="warehouse-list" id="warehouseList" style="margin-top: 18px;"></div>
                     <div class="small" id="warehouseSummary" style="margin-top: 14px;"></div>
                 </div>
@@ -805,18 +868,20 @@
             rewardOptions: [],
             history: [],
             phase: "auction",
-            nextLotDiscount: 0,
-            nextStorageFree: false,
-            nextMarketBoost: 0,
-            nextLicenseDiscount: 0,
-            nextLuckyLot: false,
-            marketBoostToday: 0,
             marketTable: {},
             chosenLotName: "",
             gameOver: false,
             victory: false,
             itemId: 1,
-            activeBonuses: [],
+            activeRewards: [],
+            dayEffects: {
+                lotDiscount: 0,
+                storageFree: false,
+                marketBoost: 0,
+                licenseDiscount: 0,
+                extraLuckyLots: 0,
+                dailyCash: 0,
+            },
             language: navigator.language && navigator.language.toLowerCase().startsWith("zh") ? "zh" : "en",
             message: {
                 zh: "",
@@ -834,12 +899,16 @@
                 clue: "Same-day flips are safer, but upside is smaller. / 更适合当天保守出货。",
                 priceBias: 0.91,
                 items: [
-                    { name: "工业电钻", min: 180, max: 280, storage: 8, swing: 0.18 },
-                    { name: "扭力扳手组", min: 110, max: 170, storage: 5, swing: 0.12 },
-                    { name: "备用铜线卷", min: 70, max: 125, storage: 4, swing: 0.15 },
-                    { name: "工地照明灯", min: 50, max: 110, storage: 5, swing: 0.16 },
+                    { nameZh: "工业电钻", nameEn: "Industrial Drill", min: 180, max: 280, storage: 8, swing: 0.18 },
+                    { nameZh: "扭力扳手组", nameEn: "Torque Wrench Set", min: 110, max: 170, storage: 5, swing: 0.12 },
+                    { nameZh: "备用铜线卷", nameEn: "Spare Copper Wire Roll", min: 70, max: 125, storage: 4, swing: 0.15 },
+                    { nameZh: "工地照明灯", nameEn: "Worksite Flood Light", min: 50, max: 110, storage: 5, swing: 0.16 },
                 ],
-                hints: ["可见工具箱边角", "货单写着维修耗材", "重量偏重，适合稳妥回本"],
+                hints: [
+                    "Toolbox corners visible. / 可见工具箱边角",
+                    "Manifest mentions repair consumables. / 货单写着维修耗材",
+                    "Heavy load with steadier recovery odds. / 重量偏重，适合稳妥回本",
+                ],
             },
             {
                 nameZh: "直播退货柜",
@@ -849,12 +918,16 @@
                 clue: "Sensitive to daily demand. Great on a hot day, rough on a cold day. / 吃当天行情。",
                 priceBias: 0.95,
                 items: [
-                    { name: "便携投影仪", min: 220, max: 390, storage: 11, swing: 0.28 },
-                    { name: "蓝牙音箱", min: 110, max: 190, storage: 6, swing: 0.24 },
-                    { name: "潮玩盲盒整箱", min: 130, max: 280, storage: 5, swing: 0.34 },
-                    { name: "直播补光灯", min: 60, max: 130, storage: 4, swing: 0.2 },
+                    { nameZh: "便携投影仪", nameEn: "Portable Projector", min: 220, max: 390, storage: 11, swing: 0.28 },
+                    { nameZh: "蓝牙音箱", nameEn: "Bluetooth Speaker", min: 110, max: 190, storage: 6, swing: 0.24 },
+                    { nameZh: "潮玩盲盒整箱", nameEn: "Blind Box Case", min: 130, max: 280, storage: 5, swing: 0.34 },
+                    { nameZh: "直播补光灯", nameEn: "Streaming Fill Light", min: 60, max: 130, storage: 4, swing: 0.2 },
                 ],
-                hints: ["纸箱标签混杂", "贴有退货仓封条", "可能开出小家电与潮玩"],
+                hints: [
+                    "Labels are mixed and messy. / 纸箱标签混杂",
+                    "Return warehouse seals still attached. / 贴有退货仓封条",
+                    "Could reveal gadgets or collectibles. / 可能开出小家电与潮玩",
+                ],
             },
             {
                 nameZh: "咖啡店清仓柜",
@@ -864,12 +937,16 @@
                 clue: "Not explosive, but usually manageable if cash is low. / 低资金时更容易稳住。",
                 priceBias: 0.92,
                 items: [
-                    { name: "半自动咖啡机", min: 200, max: 320, storage: 10, swing: 0.2 },
-                    { name: "手冲礼盒", min: 80, max: 150, storage: 4, swing: 0.16 },
-                    { name: "磨豆机", min: 120, max: 220, storage: 6, swing: 0.18 },
-                    { name: "咖啡杯套装", min: 45, max: 100, storage: 3, swing: 0.12 },
+                    { nameZh: "半自动咖啡机", nameEn: "Semi-Auto Espresso Machine", min: 200, max: 320, storage: 10, swing: 0.2 },
+                    { nameZh: "手冲礼盒", nameEn: "Pour-Over Gift Set", min: 80, max: 150, storage: 4, swing: 0.16 },
+                    { nameZh: "磨豆机", nameEn: "Coffee Grinder", min: 120, max: 220, storage: 6, swing: 0.18 },
+                    { nameZh: "咖啡杯套装", nameEn: "Coffee Cup Set", min: 45, max: 100, storage: 3, swing: 0.12 },
                 ],
-                hints: ["外箱印着咖啡豆产地", "有少量金属器具碰撞声", "适合喜欢稳定利润的玩家"],
+                hints: [
+                    "Outer box lists coffee origins. / 外箱印着咖啡豆产地",
+                    "Light metallic clinks inside. / 有少量金属器具碰撞声",
+                    "Fits players who want steadier profit. / 适合喜欢稳定利润的玩家",
+                ],
             },
             {
                 nameZh: "校园社团仓储柜",
@@ -879,12 +956,16 @@
                 clue: "Often underpriced. If the market lines up, it can carry a run. / 低价高波动，容易爽赢。",
                 priceBias: 0.68,
                 items: [
-                    { name: "二手平板", min: 160, max: 320, storage: 9, swing: 0.3 },
-                    { name: "拍立得相机", min: 120, max: 260, storage: 7, swing: 0.28 },
-                    { name: "便携音响", min: 80, max: 150, storage: 4, swing: 0.2 },
-                    { name: "印刷物料包", min: 35, max: 75, storage: 2, swing: 0.1 },
+                    { nameZh: "二手平板", nameEn: "Used Tablet", min: 160, max: 320, storage: 9, swing: 0.3 },
+                    { nameZh: "拍立得相机", nameEn: "Instant Camera", min: 120, max: 260, storage: 7, swing: 0.28 },
+                    { nameZh: "便携音响", nameEn: "Portable Speaker", min: 80, max: 150, storage: 4, swing: 0.2 },
+                    { nameZh: "印刷物料包", nameEn: "Print Materials Pack", min: 35, max: 75, storage: 2, swing: 0.1 },
                 ],
-                hints: ["箱体有活动海报残胶", "听起来不太重", "运气好会翻出电子设备"],
+                hints: [
+                    "Poster glue residue on the shell. / 箱体有活动海报残胶",
+                    "It sounds fairly light. / 听起来不太重",
+                    "A lucky hit can reveal electronics. / 运气好会翻出电子设备",
+                ],
             },
             {
                 nameZh: "民宿改造尾货柜",
@@ -894,12 +975,16 @@
                 clue: "Storage is a little heavier, but patient selling can pay off. / 更适合屯一两天。",
                 priceBias: 0.75,
                 items: [
-                    { name: "设计感吊灯", min: 210, max: 360, storage: 12, swing: 0.22 },
-                    { name: "床品四件套", min: 95, max: 170, storage: 5, swing: 0.14 },
-                    { name: "装饰画组合", min: 110, max: 200, storage: 6, swing: 0.18 },
-                    { name: "复古边桌", min: 140, max: 240, storage: 9, swing: 0.2 },
+                    { nameZh: "设计感吊灯", nameEn: "Designer Pendant Lamp", min: 210, max: 360, storage: 12, swing: 0.22 },
+                    { nameZh: "床品四件套", nameEn: "Four-Piece Bedding Set", min: 95, max: 170, storage: 5, swing: 0.14 },
+                    { nameZh: "装饰画组合", nameEn: "Decor Print Set", min: 110, max: 200, storage: 6, swing: 0.18 },
+                    { nameZh: "复古边桌", nameEn: "Vintage Side Table", min: 140, max: 240, storage: 9, swing: 0.2 },
                 ],
-                hints: ["清单里写着装饰与布草", "打开门有木头和棉织品味道", "转卖空间大但出价偏高"],
+                hints: [
+                    "Manifest lists decor and linens. / 清单里写着装饰与布草",
+                    "Smells like wood and cotton. / 打开门有木头和棉织品味道",
+                    "Good resale room, higher opening price. / 转卖空间大但出价偏高",
+                ],
             },
             {
                 nameZh: "机房淘汰柜",
@@ -909,12 +994,16 @@
                 clue: "The best days are absurdly good, the bad days hurt hard. / 需要一点运气和胆量。",
                 priceBias: 0.7,
                 items: [
-                    { name: "服务器主板", min: 240, max: 470, storage: 13, swing: 0.34 },
-                    { name: "机柜导轨套件", min: 90, max: 170, storage: 6, swing: 0.2 },
-                    { name: "品牌散热器", min: 80, max: 180, storage: 5, swing: 0.24 },
-                    { name: "高速网卡", min: 100, max: 250, storage: 7, swing: 0.3 },
+                    { nameZh: "服务器主板", nameEn: "Server Motherboard", min: 240, max: 470, storage: 13, swing: 0.34 },
+                    { nameZh: "机柜导轨套件", nameEn: "Rack Rail Kit", min: 90, max: 170, storage: 6, swing: 0.2 },
+                    { nameZh: "品牌散热器", nameEn: "Branded Cooler", min: 80, max: 180, storage: 5, swing: 0.24 },
+                    { nameZh: "高速网卡", nameEn: "High-Speed Network Card", min: 100, max: 250, storage: 7, swing: 0.3 },
                 ],
-                hints: ["贴纸写着下线资产", "重量和价值都不太好判断", "行情好的时候会很夸张"],
+                hints: [
+                    "Labels mark retired assets. / 贴纸写着下线资产",
+                    "Weight and value are both hard to judge. / 重量和价值都不太好判断",
+                    "Hot markets can make this absurd. / 行情好的时候会很夸张",
+                ],
             },
         ];
 
@@ -924,9 +1013,15 @@
                 nameEn: "Dockside Bargain",
                 nameZh: "码头讲价券",
                 cost: 0,
-                description: "Next day's container bids are 15% cheaper. / 下一天竞拍价 -15%。",
-                apply() {
-                    state.nextLotDiscount = Math.max(state.nextLotDiscount, 0.15);
+                description: "During its duration, daily container bids are 15% cheaper. / 生效期间每日竞拍价 -15%。",
+                applyDayEffect(effects) {
+                    effects.lotDiscount += 0.15;
+                },
+                describeActive(instance) {
+                    return {
+                        zh: `竞拍价 -15% · 剩 ${instance.remainingDays} 天`,
+                        en: `Bids -15% · ${instance.remainingDays} day(s) left`,
+                    };
                 },
             },
             {
@@ -934,9 +1029,15 @@
                 nameEn: "Free Storage Sheet",
                 nameZh: "免仓储清单",
                 cost: 80,
-                description: "Next overnight storage fees are fully waived. / 下一次过夜仓储费全免。",
-                apply() {
-                    state.nextStorageFree = true;
+                description: "During its duration, overnight storage is fully waived. / 生效期间每天过夜仓储费全免。",
+                applyDayEffect(effects) {
+                    effects.storageFree = true;
+                },
+                describeActive(instance) {
+                    return {
+                        zh: `过夜仓储全免 · 剩 ${instance.remainingDays} 天`,
+                        en: `Storage waived · ${instance.remainingDays} day(s) left`,
+                    };
                 },
             },
             {
@@ -944,9 +1045,15 @@
                 nameEn: "Private Buyer List",
                 nameZh: "大买家名单",
                 cost: 120,
-                description: "Tomorrow all sell prices get +55%. / 下一天所有卖价 +55%。",
-                apply() {
-                    state.nextMarketBoost = Math.max(state.nextMarketBoost, 0.55);
+                description: "During its duration, all sell prices get +55%. / 生效期间每日所有卖价 +55%。",
+                applyDayEffect(effects) {
+                    effects.marketBoost += 0.55;
+                },
+                describeActive(instance) {
+                    return {
+                        zh: `所有卖价 +55% · 剩 ${instance.remainingDays} 天`,
+                        en: `Sell prices +55% · ${instance.remainingDays} day(s) left`,
+                    };
                 },
             },
             {
@@ -954,20 +1061,32 @@
                 nameEn: "License Relief",
                 nameZh: "牌照补贴",
                 cost: 90,
-                description: "Next license fee is reduced by 18%. / 下一次牌照费 -18%。",
-                apply() {
-                    state.nextLicenseDiscount = Math.max(state.nextLicenseDiscount, 0.18);
+                description: "During its duration, license fees are reduced by 18%. / 生效期间每日牌照费 -18%。",
+                applyDayEffect(effects) {
+                    effects.licenseDiscount += 0.18;
+                },
+                describeActive(instance) {
+                    return {
+                        zh: `牌照费 -18% · 剩 ${instance.remainingDays} 天`,
+                        en: `License -18% · ${instance.remainingDays} day(s) left`,
+                    };
                 },
             },
             {
-                id: "cash",
-                nameEn: "Quick Cashback",
-                nameZh: "速返现金",
+                id: "cashflow",
+                nameEn: "Cash Drip",
+                nameZh: "现金补给",
                 cost: 0,
-                value: 360,
-                description: "Gain ¥360 immediately. / 立刻获得 ¥360。",
-                apply() {
-                    state.cash += this.value;
+                value: 180,
+                description: "Gain $180 at the start of each active day. / 生效期间每天开局获得 $180。",
+                applyDayEffect(effects, instance) {
+                    effects.dailyCash += instance.value;
+                },
+                describeActive(instance) {
+                    return {
+                        zh: `每天开局 +${formatMoney(instance.value)} · 剩 ${instance.remainingDays} 天`,
+                        en: `+${formatMoney(instance.value)} each day · ${instance.remainingDays} day(s) left`,
+                    };
                 },
             },
             {
@@ -975,37 +1094,36 @@
                 nameEn: "Valuation Note",
                 nameZh: "估价快线",
                 cost: 110,
-                description: "Tomorrow one extra Lucky lot appears in the auction. / 下一天拍卖多刷一只惊喜柜。",
-                apply() {
-                    state.nextLuckyLot = true;
+                description: "During its duration, the auction shows one extra Lucky lot. / 生效期间每天拍卖多刷一只惊喜柜。",
+                applyDayEffect(effects) {
+                    effects.extraLuckyLots += 1;
+                },
+                describeActive(instance) {
+                    return {
+                        zh: `每天多 1 只惊喜柜 · 剩 ${instance.remainingDays} 天`,
+                        en: `+1 Lucky lot each day · ${instance.remainingDays} day(s) left`,
+                    };
                 },
             },
         ];
 
+        const rewardCatalog = Object.fromEntries(rewardPool.map((reward) => [reward.id, reward]));
+
         const itemCatalog = Object.fromEntries(
             containerTemplates
                 .flatMap((template) => template.items)
-                .map((item) => [item.name, item]),
+                .map((item) => [item.nameEn, item]),
         );
 
         const heroTitle = document.getElementById("heroTitle");
         const heroSubtitle = document.getElementById("heroSubtitle");
+        const interactionHint = document.getElementById("interactionHint");
         const langZhButton = document.getElementById("langZhButton");
         const langEnButton = document.getElementById("langEnButton");
-        const mobileCashLabel = document.getElementById("mobileCashLabel");
-        const mobileCashValue = document.getElementById("mobileCashValue");
-        const mobileRoundLabel = document.getElementById("mobileRoundLabel");
-        const mobileRoundValue = document.getElementById("mobileRoundValue");
-        const mobileInvLabel = document.getElementById("mobileInvLabel");
-        const mobileInvValue = document.getElementById("mobileInvValue");
-        const mobileLicenseLabel = document.getElementById("mobileLicenseLabel");
-        const mobileLicenseValue = document.getElementById("mobileLicenseValue");
         const cashLabel = document.getElementById("cashLabel");
         const cashValue = document.getElementById("cashValue");
         const netWorthLabel = document.getElementById("netWorthLabel");
         const netWorthValue = document.getElementById("netWorthValue");
-        const inventoryLabel = document.getElementById("inventoryLabel");
-        const inventoryValue = document.getElementById("inventoryValue");
         const openedLabel = document.getElementById("openedLabel");
         const openedValue = document.getElementById("openedValue");
         const roundLabel = document.getElementById("roundLabel");
@@ -1016,24 +1134,14 @@
         const appliedRewardsButton = document.getElementById("appliedRewardsButton");
         const appliedRewardsValue = document.getElementById("appliedRewardsValue");
         const appliedRewardsBubble = document.getElementById("appliedRewardsBubble");
-        const pendingRewardsLabel = document.getElementById("pendingRewardsLabel");
-        const pendingRewardsButton = document.getElementById("pendingRewardsButton");
-        const pendingRewardsValue = document.getElementById("pendingRewardsValue");
-        const pendingRewardsBubble = document.getElementById("pendingRewardsBubble");
         const warehouseCostLabel = document.getElementById("warehouseCostLabel");
         const warehouseCostValue = document.getElementById("warehouseCostValue");
-        const warehouseAppraisalLabel = document.getElementById("warehouseAppraisalLabel");
-        const warehouseAppraisalValue = document.getElementById("warehouseAppraisalValue");
+        const auctionPanel = document.getElementById("auctionPanel");
         const auctionTitle = document.getElementById("auctionTitle");
-        const auctionIntro = document.getElementById("auctionIntro");
         const lotGrid = document.getElementById("lotGrid");
-        const rewardTitle = document.getElementById("rewardTitle");
-        const rewardLimitTag = document.getElementById("rewardLimitTag");
         const rewardGrid = document.getElementById("rewardGrid");
         const rewardSection = document.getElementById("rewardSection");
-        const rewardIntro = document.getElementById("rewardIntro");
         const warehouseLogTitle = document.getElementById("warehouseLogTitle");
-        const warehouseLogIntro = document.getElementById("warehouseLogIntro");
         const warehouseContent = document.getElementById("warehouseContent");
         const warehouseList = document.getElementById("warehouseList");
         const warehouseSummary = document.getElementById("warehouseSummary");
@@ -1041,12 +1149,13 @@
         const historyTitle = document.getElementById("historyTitle");
         const historyList = document.getElementById("historyList");
         const messageBox = document.getElementById("messageBox");
+        const skipAuctionRow = document.getElementById("skipAuctionRow");
         const skipAuctionButton = document.getElementById("skipAuctionButton");
         const skipRewardButton = document.getElementById("skipRewardButton");
         const dayActionButton = document.getElementById("dayActionButton");
 
         function formatMoney(value) {
-            return `¥${Math.round(value).toLocaleString(state.language === "zh" ? "zh-CN" : "en-US")}`;
+            return `$${Math.round(value).toLocaleString(state.language === "zh" ? "zh-CN" : "en-US")}`;
         }
 
         function localize(zhText, enText) {
@@ -1071,6 +1180,10 @@
             return localize(pair.zh, pair.en);
         }
 
+        function localizeItemName(item) {
+            return localize(item.nameZh ?? item.name, item.nameEn ?? item.name);
+        }
+
         function setLanguage(language) {
             if (state.language === language) {
                 return;
@@ -1082,6 +1195,18 @@
 
         function formatDayLabel(round) {
             return localize(`第 ${round} 天`, `D${round}`);
+        }
+
+        function getDurationText(days) {
+            return {
+                zh: `持续 ${days} 天`,
+                en: `${days} day${days > 1 ? "s" : ""}`,
+            };
+        }
+
+        function formatDuration(days) {
+            const durationText = getDurationText(days);
+            return localize(durationText.zh, durationText.en);
         }
 
         function randomInt(min, max) {
@@ -1105,6 +1230,17 @@
             }
 
             return shuffled;
+        }
+
+        function createDayEffects() {
+            return {
+                lotDiscount: 0,
+                storageFree: false,
+                marketBoost: 0,
+                licenseDiscount: 0,
+                extraLuckyLots: 0,
+                dailyCash: 0,
+            };
         }
 
         function addHistory(titleZh, titleEn, detailZh, detailEn, amount = null) {
@@ -1141,7 +1277,9 @@
             const chosenItems = shuffle(template.items).slice(0, itemCount);
             const items = chosenItems.map((item) => ({
                 id: ++state.itemId,
-                name: item.name,
+                nameZh: item.nameZh,
+                nameEn: item.nameEn,
+                marketKey: item.nameEn,
                 appraisal: Math.round(randomInt(item.min, item.max) * appraisedGrowth(state.round)),
                 storageFee: item.storage,
                 swing: item.swing,
@@ -1150,7 +1288,7 @@
             }));
             const appraisalTotal = items.reduce((sum, item) => sum + item.appraisal, 0);
             const priceRatio = template.priceBias + randomFloatBetween(-0.08, 0.18) + (state.round - 1) * 0.006;
-            const discountMultiplier = 1 - state.nextLotDiscount;
+            const discountMultiplier = 1 - state.dayEffects.lotDiscount;
 
             return {
                 nameZh: template.nameZh,
@@ -1167,7 +1305,59 @@
         }
 
         function generateRewardOptions() {
-            state.rewardOptions = shuffle(rewardPool).slice(0, 3);
+            state.rewardOptions = shuffle(rewardPool).slice(0, 3).map((reward) => ({
+                ...reward,
+                duration: randomInt(1, 3),
+            }));
+        }
+
+        function createActiveReward(reward) {
+            return {
+                rewardId: reward.id,
+                nameZh: reward.nameZh,
+                nameEn: reward.nameEn,
+                remainingDays: reward.duration,
+                duration: reward.duration,
+                value: reward.value ?? 0,
+            };
+        }
+
+        function tickActiveRewards() {
+            state.activeRewards = state.activeRewards
+                .map((reward) => ({
+                    ...reward,
+                    remainingDays: reward.remainingDays - 1,
+                }))
+                .filter((reward) => reward.remainingDays > 0);
+        }
+
+        function applyActiveRewards() {
+            const effects = createDayEffects();
+
+            state.activeRewards.forEach((instance) => {
+                const reward = rewardCatalog[instance.rewardId];
+
+                if (reward) {
+                    reward.applyDayEffect(effects, instance);
+                }
+            });
+
+            effects.lotDiscount = clamp(effects.lotDiscount, 0, 0.45);
+            effects.marketBoost = clamp(effects.marketBoost, 0, 1.4);
+            effects.licenseDiscount = clamp(effects.licenseDiscount, 0, 0.45);
+            effects.extraLuckyLots = Math.min(effects.extraLuckyLots, 2);
+            state.dayEffects = effects;
+        }
+
+        function describeActiveReward(instance) {
+            const reward = rewardCatalog[instance.rewardId];
+
+            return reward
+                ? reward.describeActive(instance)
+                : {
+                    zh: `${instance.nameZh} · 剩 ${instance.remainingDays} 天`,
+                    en: `${instance.nameEn} · ${instance.remainingDays} day(s) left`,
+                };
         }
 
         function buildMarketTable() {
@@ -1175,30 +1365,28 @@
 
             Object.values(itemCatalog).forEach((item) => {
                 const multiplier = clamp(
-                    marketGrowth(state.round) * (1 + randomFloatBetween(-item.swing, item.swing) + state.marketBoostToday),
+                    marketGrowth(state.round) * (1 + randomFloatBetween(-item.swing, item.swing) + state.dayEffects.marketBoost),
                     MIN_MARKET_MULTIPLIER,
                     MAX_MARKET_MULTIPLIER,
                 );
 
-                state.marketTable[item.name] = multiplier;
+                state.marketTable[item.nameEn] = multiplier;
             });
-
-            state.marketBoostToday = 0;
         }
 
         function refreshInventoryPrices() {
             state.inventory.forEach((item) => {
-                const multiplier = state.marketTable[item.name] || 1;
+                const multiplier = state.marketTable[item.marketKey] || 1;
                 item.currentPrice = Math.max(25, Math.round(item.appraisal * multiplier));
             });
         }
 
         function generateLots() {
-            state.lots = Array.from({ length: 3 }, () => buildLot());
+            const totalLots = 3 + state.dayEffects.extraLuckyLots;
+            state.lots = Array.from({ length: totalLots }, () => buildLot());
 
-            if (state.nextLuckyLot) {
-                state.lots[2] = buildLot((template) => template.riskLabel === "Lucky");
-                state.nextLuckyLot = false;
+            for (let index = 0; index < state.dayEffects.extraLuckyLots; index += 1) {
+                state.lots[state.lots.length - 1 - index] = buildLot((template) => template.riskLabel === "Lucky");
             }
 
             if (state.cash >= MIN_BID_PRICE && state.lots.every((lot) => lot.bid > state.cash)) {
@@ -1235,7 +1423,7 @@
 
         function getDiscountedLicenseFee() {
             const nextBaseFee = licenseFeeForRound(state.round + 1);
-            return Math.round(nextBaseFee * (1 - state.nextLicenseDiscount));
+            return Math.round(nextBaseFee * (1 - state.dayEffects.licenseDiscount));
         }
 
         function setMessage(zhText, enText, tone = "") {
@@ -1243,6 +1431,13 @@
         }
 
         function renderMessage() {
+            const shouldShow = Boolean(state.message?.zh || state.message?.en) && state.message.tone === "warn";
+            messageBox.hidden = !shouldShow;
+
+            if (!shouldShow) {
+                return;
+            }
+
             messageBox.textContent = localize(state.message.zh, state.message.en);
             messageBox.className = state.message.tone ? `message ${state.message.tone}` : "message";
         }
@@ -1253,40 +1448,27 @@
 
             heroTitle.textContent = localize("集装箱竞拍站", "Container Auction");
             heroSubtitle.textContent = localize(
-                "按天推进：先买柜子（不能卖货），再卖货，然后结束当天（需要有足够钱支付牌照费），系统扣费后进入选奖励，奖励选好后自动进入下一天。现金达到 ¥10,000 即获胜。",
-                "Each day: buy a container (selling disabled), then sell goods, then end the day (must afford the license fee). Fees are deducted, then pick a reward. Next day starts automatically.",
+                "按天推进：先买柜子，再处理仓库，结束当天后选择一条持续 1 到 3 天的奖励。现金达到 $10,000 即获胜。",
+                "Each day: buy one container, manage the warehouse, then finish the day and pick one reward that lasts 1 to 3 days. Reach $10,000 cash to win.",
             );
             document.getElementById("rulesSummary").textContent = localize("游戏说明", "How to Play");
+            interactionHint.textContent = localize("通过点击卡片来买下、卖掉、选择", "Tap cards to buy, sell, or claim");
 
-            cashLabel.textContent = localize("当前现金", "Cash");
+            cashLabel.textContent = localize("现金", "Cash");
             netWorthLabel.textContent = localize("总资产", "Net Worth");
-            inventoryLabel.textContent = localize("库存估价", "Appraisal");
-            openedLabel.textContent = localize("当日卖价", "Sell Value");
-            roundLabel.textContent = localize("当前天数", "Day");
-            licenseLabel.textContent = localize("牌照费", "License");
-            appliedRewardsLabel.textContent = localize("已生效奖励", "Applied Rewards");
-            pendingRewardsLabel.textContent = localize("待生效奖励", "Pending Rewards");
+            openedLabel.textContent = localize("库存卖价", "Sell Value");
+            roundLabel.textContent = localize("天数", "Day");
+            licenseLabel.textContent = localize("牌照费用", "License Fee");
+            appliedRewardsLabel.textContent = localize("生效奖励", "Active Rewards");
             warehouseCostLabel.textContent = localize("仓库费用", "Warehouse Cost");
-            warehouseAppraisalLabel.textContent = localize("仓库总估价", "Warehouse Appraisal");
-
-            mobileCashLabel.textContent = localize("现金", "Cash");
-            mobileRoundLabel.textContent = localize("天数", "Day");
-            mobileInvLabel.textContent = localize("库存卖价", "Inv. Value");
-            mobileLicenseLabel.textContent = localize("牌照", "Fee");
 
             const phaseTitles = {
                 auction: localize("今日竞拍", "Daily Auction"),
-                sales: localize("今日卖货", "Today's Sales"),
                 reward: localize("选择奖励", "Choose Reward"),
             };
             auctionTitle.textContent = phaseTitles[state.phase] || localize("今日操作", "Action");
-            auctionIntro.hidden = true;
-            rewardTitle.textContent = localize("额外奖励", "Extra Reward");
-            rewardLimitTag.textContent = localize("最多选一条", "Choose one");
-            rewardIntro.textContent = localize(
-                "奖励有的免费有的要花钱，通常会影响下一天，也可能直接给你现金。",
-                "Rewards may be free, cost cash, affect tomorrow, or pay out cash instantly.",
-            );
+            auctionTitle.hidden = false;
+            warehouseLogTitle.textContent = localize("仓库", "Warehouse");
             historyTitle.textContent = localize("经营记录", "History");
 
             skipAuctionButton.textContent = localize("今天不买", "Skip Buying");
@@ -1302,51 +1484,23 @@
             const storageFee = calculateStorageFee();
             cashValue.textContent = formatMoney(state.cash);
             netWorthValue.textContent = formatMoney(calculateNetWorth());
-            inventoryValue.textContent = formatMoney(appraisalTotal);
             openedValue.textContent = formatMoney(currentTotal);
-            roundValue.textContent = state.round;
+            roundValue.textContent = `D${state.round}`;
             licenseValue.textContent = formatMoney(getDiscountedLicenseFee());
             warehouseCostValue.textContent = formatMoney(storageFee);
-            warehouseAppraisalValue.textContent = formatMoney(appraisalTotal);
-            mobileCashValue.textContent = formatMoney(state.cash);
-            mobileRoundValue.textContent = formatDayLabel(state.round);
-            mobileInvValue.textContent = formatMoney(currentTotal);
-            mobileLicenseValue.textContent = formatMoney(getDiscountedLicenseFee());
         }
 
         function renderEffects() {
-            const pending = [];
+            const activeEntries = state.activeRewards.map((reward) => describeActiveReward(reward));
 
-            if (state.nextStorageFree) {
-                pending.push({
-                    zh: "下一次过夜仓储费全免",
-                    en: "Next overnight storage is fully waived",
-                });
-            }
-
-            if (state.nextLicenseDiscount > 0) {
-                pending.push({
-                    zh: `下一次牌照费 -${Math.round(state.nextLicenseDiscount * 100)}%`,
-                    en: `Next license fee -${Math.round(state.nextLicenseDiscount * 100)}%`,
-                });
-            }
-
-            appliedRewardsValue.textContent = state.activeBonuses.length;
-            pendingRewardsValue.textContent = pending.length;
+            appliedRewardsValue.textContent = activeEntries.length;
 
             renderRewardBubble(
                 appliedRewardsButton,
                 appliedRewardsBubble,
-                localize("已生效奖励", "Applied Rewards"),
-                state.activeBonuses,
-                localize("本日暂无已生效奖励。", "No rewards have taken effect today."),
-            );
-            renderRewardBubble(
-                pendingRewardsButton,
-                pendingRewardsBubble,
-                localize("待生效奖励", "Pending Rewards"),
-                pending,
-                localize("暂无待生效奖励。", "No pending rewards right now."),
+                localize("当前生效奖励", "Current Active Rewards"),
+                activeEntries,
+                localize("当前没有生效中的奖励。", "No rewards are active right now."),
             );
         }
 
@@ -1360,6 +1514,34 @@
                 <div class="status-bubble-list">${listHtml}</div>
             `;
             button.setAttribute("aria-label", `${title}: ${entries.length}`);
+        }
+
+        function makeInteractiveCard(card, options) {
+            const {
+                enabled,
+                onActivate,
+                labelZh,
+                labelEn,
+            } = options;
+
+            card.classList.add("interactive-card");
+
+            if (!enabled) {
+                card.classList.add("interactive-card-disabled");
+                card.setAttribute("aria-disabled", "true");
+                return;
+            }
+
+            card.tabIndex = 0;
+            card.setAttribute("role", "button");
+            card.setAttribute("aria-label", localize(labelZh, labelEn));
+            card.addEventListener("click", onActivate);
+            card.addEventListener("keydown", (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onActivate();
+                }
+            });
         }
 
         function renderLots() {
@@ -1382,7 +1564,7 @@
                     </div>
                     <div class="small">${localizePairText(lot.clue)}</div>
                     <ul class="hint-list">
-                        ${lot.hints.map((hint) => `<li>${hint}</li>`).join("")}
+                        ${lot.hints.map((hint) => `<li>${localizePairText(hint)}</li>`).join("")}
                     </ul>
                     <div class="meta-grid">
                         <div class="meta-box small">${localize(`货物数：${lot.items.length}`, `Items: ${lot.items.length}`)}</div>
@@ -1390,12 +1572,13 @@
                     </div>
                 `;
 
-                const button = document.createElement("button");
-                button.className = "bid-button";
-                button.textContent = state.cash >= lot.bid ? localize("买下这只柜子", "Buy This Lot") : localize("现金不足", "Need More Cash");
-                button.disabled = state.phase !== "auction" || state.cash < lot.bid || state.gameOver || state.victory;
-                button.addEventListener("click", () => buyLot(index));
-                card.appendChild(button);
+                const canBuy = state.phase === "auction" && state.cash >= lot.bid && !state.gameOver && !state.victory;
+                makeInteractiveCard(card, {
+                    enabled: canBuy,
+                    onActivate: () => buyLot(index),
+                    labelZh: `点击买下 ${lot.nameZh}`,
+                    labelEn: `Tap to buy ${lot.nameEn}`,
+                });
                 lotGrid.appendChild(card);
             });
         }
@@ -1410,7 +1593,10 @@
                 card.innerHTML = `
                     <div class="reward-top">
                         <div>
-                            <span class="reward-tag">${localize(reward.nameZh, reward.nameEn)}</span>
+                            <div class="reward-badges">
+                                <span class="reward-tag">${localize(reward.nameZh, reward.nameEn)}</span>
+                                <span class="reward-tag duration-tag">${formatDuration(reward.duration)}</span>
+                            </div>
                             <h3 style="margin: 10px 0 0;">${localize(reward.nameZh, reward.nameEn)}</h3>
                         </div>
                         <strong>${reward.cost > 0 ? formatMoney(reward.cost) : localize("免费", "Free")}</strong>
@@ -1418,12 +1604,13 @@
                     <div class="small">${localizePairText(reward.description)}</div>
                 `;
 
-                const button = document.createElement("button");
-                button.className = "reward-button";
-                button.textContent = reward.cost <= state.cash ? localize("选择这条", "Claim Reward") : localize("现金不足", "Need More Cash");
-                button.disabled = state.phase !== "reward" || reward.cost > state.cash || state.gameOver || state.victory;
-                button.addEventListener("click", () => chooseReward(reward.id));
-                card.appendChild(button);
+                const canClaim = state.phase === "reward" && reward.cost <= state.cash && !state.gameOver && !state.victory;
+                makeInteractiveCard(card, {
+                    enabled: canClaim,
+                    onActivate: () => chooseReward(reward.id),
+                    labelZh: `点击选择 ${reward.nameZh}`,
+                    labelEn: `Tap to claim ${reward.nameEn}`,
+                });
                 rewardGrid.appendChild(card);
             });
         }
@@ -1448,7 +1635,7 @@
                         <div class="warehouse-top">
                             <div>
                                 <span class="market-tag ${market.tone}">${localize(market.labelZh, market.labelEn)}</span>
-                                <h3 class="warehouse-name">${item.name}</h3>
+                                <h3 class="warehouse-name">${localizeItemName(item)}</h3>
                                 <div class="small">${localize(`第 ${item.acquiredRound} 天入库`, `Stored on day ${item.acquiredRound}`)}</div>
                             </div>
                             <strong class="warehouse-price">${formatMoney(item.currentPrice)}</strong>
@@ -1459,12 +1646,13 @@
                         </div>
                     `;
 
-                    const sellButton = document.createElement("button");
-                    sellButton.className = "sell-button";
-                    sellButton.textContent = localize("今天卖掉", "Sell Today");
-                    sellButton.disabled = state.phase !== "sales" || state.gameOver || state.victory;
-                    sellButton.addEventListener("click", () => sellItem(item.id));
-                    element.appendChild(sellButton);
+                    const canSell = state.phase === "sales" && !state.gameOver && !state.victory;
+                    makeInteractiveCard(element, {
+                        enabled: canSell,
+                        onActivate: () => sellItem(item.id),
+                        labelZh: `点击卖掉 ${item.nameZh}`,
+                        labelEn: `Tap to sell ${item.nameEn}`,
+                    });
                     warehouseList.appendChild(element);
                 });
             }
@@ -1511,13 +1699,15 @@
 
         function renderPhase() {
             const isAuction = state.phase === "auction" && !state.gameOver && !state.victory;
+            skipAuctionRow.hidden = !isAuction;
             skipAuctionButton.hidden = !isAuction;
             skipAuctionButton.disabled = !isAuction;
             skipRewardButton.disabled = state.phase !== "reward" || state.gameOver || state.victory;
+            auctionPanel.classList.toggle("reward-mode", state.phase === "reward" && !state.gameOver && !state.victory);
 
             const showWarehouse = state.phase === "sales" && !state.gameOver && !state.victory;
+            auctionPanel.hidden = state.phase === "sales" && !state.gameOver && !state.victory;
             warehouseContent.hidden = !showWarehouse;
-            warehouseLogTitle.textContent = localize("仓库", "Warehouse");
             lotGrid.hidden = state.phase !== "auction" || state.gameOver || state.victory;
         }
 
@@ -1553,36 +1743,23 @@
         function startDay() {
             state.phase = "auction";
             state.chosenLotName = "";
-            state.activeBonuses = [];
+            applyActiveRewards();
 
-            if (state.nextLotDiscount > 0) {
-                state.activeBonuses.push({
-                    zh: `今日竞拍价已打 ${Math.round(state.nextLotDiscount * 100)}% 折`,
-                    en: `Today's bids already have a ${Math.round(state.nextLotDiscount * 100)}% discount`,
-                });
+            if (state.dayEffects.dailyCash > 0) {
+                state.cash += state.dayEffects.dailyCash;
+                addHistory(
+                    `第 ${state.round} 天奖励入账`,
+                    `Day ${state.round} reward payout`,
+                    `生效奖励带来 ${formatMoney(state.dayEffects.dailyCash)}`,
+                    `Active rewards paid ${formatMoney(state.dayEffects.dailyCash)}`,
+                    state.dayEffects.dailyCash,
+                );
             }
 
-            if (state.nextMarketBoost > 0) {
-                state.activeBonuses.push({
-                    zh: `今天卖价 +${Math.round(state.nextMarketBoost * 100)}%`,
-                    en: `Today's sell prices +${Math.round(state.nextMarketBoost * 100)}%`,
-                });
-            }
-
-            if (state.nextLuckyLot) {
-                state.activeBonuses.push({
-                    zh: "今天拍卖额外刷出一只惊喜柜",
-                    en: "Today's auction has one extra Lucky lot",
-                });
-            }
-
-            state.marketBoostToday = state.nextMarketBoost;
-            state.nextMarketBoost = 0;
             buildMarketTable();
             refreshInventoryPrices();
             generateLots();
             generateRewardOptions();
-            render();
         }
 
         function checkForVictory() {
@@ -1620,7 +1797,6 @@
             refreshInventoryPrices();
             state.phase = "sales";
             state.chosenLotName = localize(lot.nameZh, lot.nameEn);
-            state.nextLotDiscount = 0;
             addHistory(
                 `第 ${state.round} 天买下 ${lot.nameZh}`,
                 `Day ${state.round} bought ${lot.nameEn}`,
@@ -1643,7 +1819,6 @@
             }
 
             state.phase = "sales";
-            state.nextLotDiscount = 0;
             addHistory(
                 `第 ${state.round} 天跳过竞拍`,
                 `Day ${state.round} skipped the auction`,
@@ -1673,15 +1848,15 @@
             state.cash += item.currentPrice;
             state.inventory.splice(itemIndex, 1);
             addHistory(
-                `第 ${state.round} 天卖出 ${item.name}`,
-                `Day ${state.round} sold ${item.name}`,
+                `第 ${state.round} 天卖出 ${item.nameZh}`,
+                `Day ${state.round} sold ${item.nameEn}`,
                 `以 ${formatMoney(item.currentPrice)} 卖出`,
                 `Sold for ${formatMoney(item.currentPrice)}`,
                 item.currentPrice,
             );
             setMessage(
-                `你以 ${formatMoney(item.currentPrice)} 卖出了 ${item.name}。`,
-                `Sold ${item.name} for ${formatMoney(item.currentPrice)}.`,
+                `你以 ${formatMoney(item.currentPrice)} 卖出了 ${item.nameZh}。`,
+                `Sold ${item.nameEn} for ${formatMoney(item.currentPrice)}.`,
                 item.currentPrice >= item.appraisal ? "good" : "info",
             );
             refreshInventoryPrices();
@@ -1713,11 +1888,9 @@
                 return;
             }
 
-            const storageFee = state.nextStorageFree ? 0 : calculateStorageFee();
+            const storageFee = state.dayEffects.storageFree ? 0 : calculateStorageFee();
             state.cash -= storageFee;
             state.cash -= licenseFee;
-            state.nextStorageFree = false;
-            state.nextLicenseDiscount = 0;
 
             addHistory(
                 `第 ${state.round} 天结算`,
@@ -1741,13 +1914,24 @@
             render();
         }
 
-        function advanceToNextDay(rewardNameZh = null, rewardNameEn = null) {
+        function advanceToNextDay(selectedReward = null) {
+            tickActiveRewards();
+
+            if (selectedReward) {
+                state.activeRewards.push(createActiveReward(selectedReward));
+            }
+
             state.round += 1;
             startDay();
-            if (rewardNameZh) {
+
+            if (checkForVictory()) {
+                return;
+            }
+
+            if (selectedReward) {
                 setMessage(
-                    `第 ${state.round} 天开始，奖励「${rewardNameZh}」已生效。`,
-                    `Day ${state.round} begins. Reward "${rewardNameEn}" is active.`,
+                    `第 ${state.round} 天开始，奖励「${selectedReward.nameZh}」生效 ${selectedReward.duration} 天。`,
+                    `Day ${state.round} begins. "${selectedReward.nameEn}" is active for ${selectedReward.duration} day(s).`,
                     "info",
                 );
             } else {
@@ -1774,29 +1958,22 @@
             }
 
             const rewardDescription = parsePairText(reward.description);
+            const rewardDuration = getDurationText(reward.duration);
             state.cash -= reward.cost;
-            reward.apply();
-
-            if (reward.id === "cash") {
-                state.activeBonuses.push({
-                    zh: `速返现金已到账 ${formatMoney(reward.value)}`,
-                    en: `Quick cashback received ${formatMoney(reward.value)}`,
-                });
-            }
 
             addHistory(
                 `第 ${state.round} 天奖励：${reward.nameZh}`,
                 `Day ${state.round} reward: ${reward.nameEn}`,
-                `${reward.nameZh} · ${rewardDescription.zh}`,
-                `${reward.nameEn} · ${rewardDescription.en}`,
-                reward.id === "cash" ? reward.value : reward.cost > 0 ? -reward.cost : null,
+                `${reward.nameZh} · ${rewardDuration.zh} · ${rewardDescription.zh}`,
+                `${reward.nameEn} · ${rewardDuration.en} · ${rewardDescription.en}`,
+                reward.cost > 0 ? -reward.cost : null,
             );
 
             if (checkForVictory()) {
                 return;
             }
 
-            advanceToNextDay(reward.nameZh, reward.nameEn);
+            advanceToNextDay(reward);
         }
 
         function skipReward() {
@@ -1829,27 +2006,15 @@
         appliedRewardsButton.addEventListener("click", (event) => {
             event.stopPropagation();
             const shouldOpen = appliedRewardsBubble.hidden;
-            pendingRewardsBubble.hidden = true;
             appliedRewardsBubble.hidden = !shouldOpen;
             appliedRewardsButton.setAttribute("aria-expanded", String(shouldOpen));
-            pendingRewardsButton.setAttribute("aria-expanded", "false");
-        });
-        pendingRewardsButton.addEventListener("click", (event) => {
-            event.stopPropagation();
-            const shouldOpen = pendingRewardsBubble.hidden;
-            appliedRewardsBubble.hidden = true;
-            pendingRewardsBubble.hidden = !shouldOpen;
-            pendingRewardsButton.setAttribute("aria-expanded", String(shouldOpen));
-            appliedRewardsButton.setAttribute("aria-expanded", "false");
         });
         historyToggle.addEventListener("toggle", () => {
             historyTitle.setAttribute("aria-expanded", String(historyToggle.open));
         });
         document.addEventListener("click", () => {
             appliedRewardsBubble.hidden = true;
-            pendingRewardsBubble.hidden = true;
             appliedRewardsButton.setAttribute("aria-expanded", "false");
-            pendingRewardsButton.setAttribute("aria-expanded", "false");
         });
 
         addHistory(
