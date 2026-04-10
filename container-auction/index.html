@@ -468,6 +468,8 @@
         const MIN_BID_PRICE = 180;
         const CONTAINER_GROWTH = 1.055;
         const MARKET_GROWTH = 1.075;
+        const MIN_MARKET_MULTIPLIER = 0.48;
+        const MAX_MARKET_MULTIPLIER = 2.15;
         const MAX_HISTORY_ENTRIES = 10;
         const BASE_LICENSE_FEE = 230;
         const LICENSE_GROWTH = 1.18;
@@ -686,7 +688,7 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function randomBetween(min, max) {
+        function randomFloatBetween(min, max) {
             return Math.random() * (max - min) + min;
         }
 
@@ -746,7 +748,7 @@
                 currentPrice: 0,
             }));
             const appraisalTotal = items.reduce((sum, item) => sum + item.appraisal, 0);
-            const priceRatio = template.priceBias + randomBetween(-0.08, 0.18) + (state.round - 1) * 0.006;
+            const priceRatio = template.priceBias + randomFloatBetween(-0.08, 0.18) + (state.round - 1) * 0.006;
             const discountMultiplier = 1 - state.nextLotDiscount;
 
             return {
@@ -772,9 +774,9 @@
 
             Object.values(itemCatalog).forEach((item) => {
                 const multiplier = clamp(
-                    marketGrowth(state.round) * (1 + randomBetween(-item.swing, item.swing) + state.marketBoostToday),
-                    0.48,
-                    2.15,
+                    marketGrowth(state.round) * (1 + randomFloatBetween(-item.swing, item.swing) + state.marketBoostToday),
+                    MIN_MARKET_MULTIPLIER,
+                    MAX_MARKET_MULTIPLIER,
                 );
 
                 state.marketTable[item.name] = multiplier;
