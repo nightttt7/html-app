@@ -505,7 +505,7 @@
                 hints: template.hints,
                 items,
                 resaleValue,
-                bid: Math.min(reservePrice, resaleValue - MIN_PROFIT_MARGIN),
+                bid: Math.max(MIN_BID_PRICE, Math.min(reservePrice, resaleValue - MIN_PROFIT_MARGIN)),
             };
         }
 
