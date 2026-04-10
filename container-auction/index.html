@@ -865,19 +865,7 @@
             return state.language === "zh" ? (zhText || enText || "") : (enText || zhText || "");
         }
 
-        function localizePairText(text) {
-            const delimiter = " / ";
-            const delimiterIndex = text.indexOf(delimiter);
-            if (delimiterIndex === -1) {
-                return text;
-            }
-
-            const enText = text.slice(0, delimiterIndex);
-            const zhText = text.slice(delimiterIndex + delimiter.length);
-            return localize(zhText, enText);
-        }
-
-        function splitPairText(text) {
+        function parsePairText(text) {
             const delimiter = " / ";
             const delimiterIndex = text.indexOf(delimiter);
             if (delimiterIndex === -1) {
@@ -890,6 +878,11 @@
             };
         }
 
+        function localizePairText(text) {
+            const pair = parsePairText(text);
+            return localize(pair.zh, pair.en);
+        }
+
         function setLanguage(language) {
             if (state.language === language) {
                 return;
@@ -899,7 +892,7 @@
             render();
         }
 
-        function formatRoundLabel(round) {
+        function formatDayLabel(round) {
             return localize(`第 ${round} 天`, `D${round}`);
         }
 
@@ -1193,7 +1186,7 @@
             roundValue.textContent = state.round;
             licenseValue.textContent = formatMoney(getDiscountedLicenseFee());
             mobileCashValue.textContent = formatMoney(state.cash);
-            mobileRoundValue.textContent = formatRoundLabel(state.round);
+            mobileRoundValue.textContent = formatDayLabel(state.round);
             mobileLicenseValue.textContent = formatMoney(getDiscountedLicenseFee());
         }
 
@@ -1603,7 +1596,7 @@
                 return;
             }
 
-            const rewardDescription = splitPairText(reward.description);
+            const rewardDescription = parsePairText(reward.description);
             state.cash -= reward.cost;
             reward.apply();
             addHistory(
