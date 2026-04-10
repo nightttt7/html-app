@@ -637,7 +637,7 @@
             gameOver: false,
             victory: false,
             itemId: 1,
-            language: "zh",
+            language: navigator.language && navigator.language.toLowerCase().startsWith("zh") ? "zh" : "en",
             message: {
                 zh: "",
                 en: "",
@@ -1473,7 +1473,7 @@
 
             if (!lot || lot.bid > state.cash) {
                 setMessage("这只柜子现在买不起。", "You cannot afford this lot.", "warn");
-                renderMessage();
+                render();
                 return;
             }
 
@@ -1592,7 +1592,7 @@
 
             if (!reward || reward.cost > state.cash) {
                 setMessage("这条奖励现在买不起。", "You cannot afford this reward.", "warn");
-                renderMessage();
+                render();
                 return;
             }
 
@@ -1676,7 +1676,7 @@
                 `Day ${state.round} begins. Overnight costs were ${formatMoney(storageFee)} and the license was ${formatMoney(licenseFee)}.`,
                 "info",
             );
-            renderMessage();
+            render();
         }
 
         skipAuctionButton.addEventListener("click", skipAuction);
