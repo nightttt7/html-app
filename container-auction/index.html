@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>集装箱竞拍 Demo</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: rgba(15, 23, 42, 0.82);
+            --panel-soft: rgba(30, 41, 59, 0.82);
+            --card: rgba(255, 255, 255, 0.08);
+            --line: rgba(148, 163, 184, 0.24);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #f59e0b;
+            --accent-strong: #f97316;
+            --success: #22c55e;
+            --danger: #fb7185;
+            --shadow: 0 24px 48px rgba(15, 23, 42, 0.35);
+            --radius: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(circle at top, rgba(249, 115, 22, 0.24), transparent 24%),
+                radial-gradient(circle at 80% 15%, rgba(34, 197, 94, 0.2), transparent 20%),
+                linear-gradient(180deg, #020617 0%, #0f172a 100%);
+        }
+
+        .page {
+            width: min(1160px, calc(100% - 32px));
+            margin: 24px auto;
+            padding: 28px;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 32px;
+            background: rgba(2, 6, 23, 0.7);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+        }
+
+        .hero {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .eyebrow {
+            margin: 0;
+            color: #fdba74;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(2.2rem, 5vw, 4rem);
+            line-height: 0.95;
+        }
+
+        .subtitle {
+            max-width: 62ch;
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin: 24px 0;
+        }
+
+        .stat-card,
+        .panel,
+        .lot-card,
+        .history-item,
+        .item-chip {
+            border: 1px solid var(--line);
+            background: var(--card);
+            border-radius: var(--radius);
+        }
+
+        .stat-card {
+            padding: 18px 20px;
+        }
+
+        .stat-label {
+            display: block;
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: clamp(1.4rem, 3vw, 2.2rem);
+            font-weight: 800;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.8fr);
+            gap: 20px;
+        }
+
+        .panel {
+            padding: 22px;
+            background: var(--panel);
+        }
+
+        .panel h2,
+        .panel h3 {
+            margin: 0 0 8px;
+        }
+
+        .panel p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .lot-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .lot-card {
+            padding: 18px;
+            display: grid;
+            gap: 14px;
+            background: var(--panel-soft);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        }
+
+        .lot-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .lot-tag {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(245, 158, 11, 0.12);
+            color: #fdba74;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .lot-name {
+            margin: 0;
+            font-size: 1.15rem;
+        }
+
+        .lot-subtitle {
+            margin-top: 4px;
+        }
+
+        .lot-price {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .hint-list,
+        .item-list,
+        .history-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .hint-list {
+            padding-left: 18px;
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .hint-list li {
+            line-height: 1.5;
+        }
+
+        .action-row,
+        .result-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        button {
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 16px;
+            font: inherit;
+            font-weight: 800;
+            cursor: pointer;
+            transition: transform 160ms ease, opacity 160ms ease, background 160ms ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+
+        .bid-button,
+        .next-button {
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            color: #1c1917;
+        }
+
+        .reroll-button {
+            background: rgba(148, 163, 184, 0.14);
+            color: var(--text);
+            border: 1px solid var(--line);
+        }
+
+        .message {
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: rgba(148, 163, 184, 0.12);
+            color: #e5edf6;
+            min-height: 54px;
+        }
+
+        .message.good {
+            background: rgba(34, 197, 94, 0.14);
+            color: #bbf7d0;
+        }
+
+        .message.warn {
+            background: rgba(251, 113, 133, 0.14);
+            color: #fecdd3;
+        }
+
+        .result-panel {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 22px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .item-chip {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px 14px;
+        }
+
+        .profit {
+            font-weight: 800;
+        }
+
+        .profit.positive {
+            color: #86efac;
+        }
+
+        .history-item {
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.45);
+        }
+
+        .history-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .small {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 980px) {
+            .stats,
+            .lot-grid,
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <p class="eyebrow">HTML Demo / 单页 HTML 游戏 Demo</p>
+            <h1>Container Auction / 集装箱竞拍站</h1>
+            <p class="subtitle">Start with seed money, bid on random containers, then flip the hidden goods for profit. 用一笔启动资金参加港口盲拍，每回合从 3 个随机集装箱里挑一个出价，卖出货物后继续滚动资金。</p>
+        </section>
+
+        <section class="stats">
+            <article class="stat-card">
+                <span class="stat-label">Cash / 当前现金</span>
+                <strong class="stat-value" id="cashValue">¥0</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Profit / 累计利润</span>
+                <strong class="stat-value" id="profitValue">¥0</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Containers / 已竞拍集装箱</span>
+                <strong class="stat-value" id="openedValue">0</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Round / 当前回合</span>
+                <strong class="stat-value" id="roundValue">1</strong>
+            </article>
+        </section>
+
+        <section class="layout">
+            <section class="panel">
+                <h2>Random Lots / 正在拍卖的随机集装箱</h2>
+                <p>Each purchase refreshes the market with new mock data. 每次竞拍后都会刷新新的货柜，你可以自由选择更稳妥或更高价值的线索。</p>
+                <div class="action-row" style="margin-top: 18px;">
+                    <button class="reroll-button" id="rerollButton">Refresh Lots / 刷新本轮拍卖</button>
+                    <span class="small">Free reroll, mock data only / 不扣钱，只会换一批随机 mock 数据。</span>
+                </div>
+                <div class="lot-grid" id="lotGrid"></div>
+                <div class="message" id="messageBox"></div>
+                <div class="result-panel" id="resultPanel" hidden>
+                    <div class="result-row">
+                        <h3 id="resultTitle" style="margin: 0;"></h3>
+                        <span class="lot-tag" id="resultTag"></span>
+                    </div>
+                    <p id="resultSummary" style="margin: 8px 0 14px;"></p>
+                    <div class="item-list" id="itemList"></div>
+                    <div class="result-row" style="margin-top: 14px;">
+                        <strong>Settlement / 本次结算：</strong>
+                        <span id="resultFinance"></span>
+                    </div>
+                    <button class="next-button" id="nextRoundButton" style="margin-top: 16px;">Next Round / 继续买下一个集装箱</button>
+                </div>
+            </section>
+
+            <aside class="panel">
+                <h2>History / 经营记录</h2>
+                <p>Every opened container is sold immediately for cash flow. 每次开箱都会自动把货物快速出售，利润会直接回到现金池。</p>
+                <div class="history-list" id="historyList" style="margin-top: 18px;"></div>
+            </aside>
+        </section>
+    </main>
+
+    <script>
+        const STARTING_CASH = 1800;
+        const MIN_BID_PRICE = 120;
+        const MIN_RESERVE_RATIO = 0.52;
+        const RESERVE_RATIO_VARIANCE = 0.16;
+        const MIN_PROFIT_MARGIN = 40;
+        const AFFORDABLE_BID_RATIO = 0.72;
+        const MAX_HISTORY_ENTRIES = 6;
+        const state = {
+            cash: STARTING_CASH,
+            round: 1,
+            opened: 0,
+            lots: [],
+            history: [],
+        };
+
+        const containerTemplates = [
+            {
+                nameZh: "港口维修柜",
+                nameEn: "Port Repair Locker",
+                risk: "稳健",
+                riskLabel: "Steady",
+                hints: ["可见工具箱边角", "货单写着维修耗材", "重量偏重，适合稳妥回本"],
+                items: [
+                    { name: "工业电钻", min: 180, max: 260 },
+                    { name: "扭力扳手组", min: 120, max: 180 },
+                    { name: "备用铜线卷", min: 80, max: 130 },
+                    { name: "工地照明灯", min: 60, max: 120 },
+                ],
+            },
+            {
+                nameZh: "直播退货柜",
+                nameEn: "Livestream Return Crate",
+                risk: "热门",
+                riskLabel: "Hot",
+                hints: ["纸箱标签混杂", "贴有退货仓封条", "可能开出小家电与潮玩"],
+                items: [
+                    { name: "便携投影仪", min: 200, max: 340 },
+                    { name: "蓝牙音箱", min: 120, max: 180 },
+                    { name: "潮玩盲盒整箱", min: 150, max: 260 },
+                    { name: "直播补光灯", min: 70, max: 130 },
+                ],
+            },
+            {
+                nameZh: "咖啡店清仓柜",
+                nameEn: "Cafe Clearance Box",
+                risk: "稳健",
+                riskLabel: "Steady",
+                hints: ["外箱印着咖啡豆产地", "有少量金属器具碰撞声", "适合喜欢稳定利润的玩家"],
+                items: [
+                    { name: "半自动咖啡机", min: 220, max: 320 },
+                    { name: "手冲礼盒", min: 90, max: 150 },
+                    { name: "磨豆机", min: 140, max: 210 },
+                    { name: "咖啡杯套装", min: 50, max: 110 },
+                ],
+            },
+            {
+                nameZh: "校园社团仓储柜",
+                nameEn: "Campus Club Storage",
+                risk: "惊喜",
+                riskLabel: "Lucky",
+                hints: ["箱体有活动海报残胶", "听起来不太重", "运气好会翻出电子设备"],
+                items: [
+                    { name: "二手平板", min: 180, max: 280 },
+                    { name: "拍立得相机", min: 160, max: 250 },
+                    { name: "便携音响", min: 90, max: 140 },
+                    { name: "印刷物料包", min: 40, max: 80 },
+                ],
+            },
+            {
+                nameZh: "民宿改造尾货柜",
+                nameEn: "Guesthouse Remodel Overstock",
+                risk: "大件",
+                riskLabel: "Bulky",
+                hints: ["清单里写着装饰与布草", "打开门有木头和棉织品味道", "转卖空间大但出价偏高"],
+                items: [
+                    { name: "设计感吊灯", min: 220, max: 340 },
+                    { name: "床品四件套", min: 110, max: 170 },
+                    { name: "装饰画组合", min: 120, max: 180 },
+                    { name: "复古边桌", min: 150, max: 230 },
+                ],
+            },
+        ];
+
+        const cashValue = document.getElementById("cashValue");
+        const profitValue = document.getElementById("profitValue");
+        const openedValue = document.getElementById("openedValue");
+        const roundValue = document.getElementById("roundValue");
+        const lotGrid = document.getElementById("lotGrid");
+        const historyList = document.getElementById("historyList");
+        const messageBox = document.getElementById("messageBox");
+        const resultPanel = document.getElementById("resultPanel");
+        const resultTitle = document.getElementById("resultTitle");
+        const resultTag = document.getElementById("resultTag");
+        const resultSummary = document.getElementById("resultSummary");
+        const itemList = document.getElementById("itemList");
+        const resultFinance = document.getElementById("resultFinance");
+        const nextRoundButton = document.getElementById("nextRoundButton");
+        const rerollButton = document.getElementById("rerollButton");
+
+        function formatMoney(value) {
+            return `¥${value.toLocaleString("zh-CN")}`;
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function pickTemplate() {
+            return containerTemplates[randomInt(0, containerTemplates.length - 1)];
+        }
+
+        function shuffleItems(items) {
+            const shuffled = [...items];
+
+            for (let currentIndex = shuffled.length - 1; currentIndex > 0; currentIndex -= 1) {
+                const randomIndex = randomInt(0, currentIndex);
+                [shuffled[currentIndex], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[currentIndex]];
+            }
+
+            return shuffled;
+        }
+
+        function buildLot() {
+            const template = pickTemplate();
+            const itemCount = randomInt(2, 4);
+            const shuffled = shuffleItems(template.items).slice(0, itemCount);
+            const items = shuffled.map((item) => ({
+                name: item.name,
+                value: randomInt(item.min, item.max),
+            }));
+            const resaleValue = items.reduce((sum, item) => sum + item.value, 0);
+            const reservePrice = Math.max(
+                MIN_BID_PRICE,
+                Math.floor(resaleValue * (MIN_RESERVE_RATIO + Math.random() * RESERVE_RATIO_VARIANCE)),
+            );
+
+            return {
+                nameZh: template.nameZh,
+                nameEn: template.nameEn,
+                risk: template.risk,
+                riskLabel: template.riskLabel,
+                hints: template.hints,
+                items,
+                resaleValue,
+                bid: Math.max(MIN_BID_PRICE, Math.min(reservePrice, resaleValue - MIN_PROFIT_MARGIN)),
+            };
+        }
+
+        function generateLots() {
+            state.lots = Array.from({ length: 3 }, buildLot);
+
+            if (state.lots.every((lot) => lot.bid > state.cash)) {
+                state.lots.sort((left, right) => left.bid - right.bid);
+                state.lots[0].bid = Math.max(MIN_BID_PRICE, Math.floor(state.cash * AFFORDABLE_BID_RATIO));
+            }
+        }
+
+        function setMessage(text, tone = "") {
+            messageBox.textContent = text;
+            messageBox.className = tone ? `message ${tone}` : "message";
+        }
+
+        function renderStats() {
+            cashValue.textContent = formatMoney(state.cash);
+            profitValue.textContent = formatMoney(state.cash - STARTING_CASH);
+            openedValue.textContent = state.opened;
+            roundValue.textContent = state.round;
+        }
+
+        function renderLots() {
+            lotGrid.innerHTML = "";
+
+            state.lots.forEach((lot, index) => {
+                const card = document.createElement("article");
+                card.className = "lot-card";
+                card.innerHTML = `
+                    <div class="lot-top">
+                        <div>
+                            <span class="lot-tag">${lot.riskLabel} / ${lot.risk}</span>
+                            <h3 class="lot-name">${lot.nameEn}</h3>
+                            <div class="small lot-subtitle">${lot.nameZh}</div>
+                        </div>
+                        <strong class="lot-price">${formatMoney(lot.bid)}</strong>
+                    </div>
+                    <ul class="hint-list">
+                        ${lot.hints.map((hint) => `<li>${hint}</li>`).join("")}
+                    </ul>
+                `;
+
+                const button = document.createElement("button");
+                button.className = "bid-button";
+                button.textContent = state.cash >= lot.bid ? `Bid Now / 竞标这个柜子` : `Need More Cash / 现金不足`;
+                button.disabled = state.cash < lot.bid;
+                button.addEventListener("click", () => buyLot(index));
+                card.appendChild(button);
+                lotGrid.appendChild(card);
+            });
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = "";
+
+            if (state.history.length === 0) {
+                const empty = document.createElement("div");
+                empty.className = "history-item";
+                empty.innerHTML = "<strong>No containers opened yet / 还没开箱</strong><div class='small' style='margin-top: 6px;'>Buy your first lot and the log will appear here. 先买下第一个随机集装箱，记录会显示在这里。</div>";
+                historyList.appendChild(empty);
+                return;
+            }
+
+            state.history.forEach((entry) => {
+                const element = document.createElement("article");
+                element.className = "history-item";
+                element.innerHTML = `
+                    <div class="history-head">
+                        <div>
+                            <strong>${entry.nameEn}</strong>
+                            <div class="small">${entry.nameZh}</div>
+                        </div>
+                        <span class="profit ${entry.profit >= 0 ? "positive" : ""}">${entry.profit >= 0 ? "+" : ""}${formatMoney(entry.profit)}</span>
+                    </div>
+                    <div class="small">Bid ${formatMoney(entry.bid)} · Sale ${formatMoney(entry.sale)} / 成交价 ${formatMoney(entry.bid)} · 卖货收入 ${formatMoney(entry.sale)}</div>
+                `;
+                historyList.appendChild(element);
+            });
+        }
+
+        function showResult(lot, sale, profit) {
+            resultTitle.textContent = `${lot.nameEn} / ${lot.nameZh}`;
+            resultTag.textContent = `${lot.riskLabel} · Cleared`;
+            resultSummary.textContent = `You bought this lot for ${formatMoney(lot.bid)} and sold every item immediately. 你以 ${formatMoney(lot.bid)} 拍下该集装箱，并把里面的货物全部出手。`;
+            itemList.innerHTML = lot.items
+                .map((item) => `<div class="item-chip"><span>${item.name}</span><strong>${formatMoney(item.value)}</strong></div>`)
+                .join("");
+            resultFinance.innerHTML = `Sale total <strong>${formatMoney(sale)}</strong>, profit <span class="profit positive">+${formatMoney(profit)}</span> / 卖出总额 <strong>${formatMoney(sale)}</strong>，本次利润 <span class="profit positive">+${formatMoney(profit)}</span>`;
+            resultPanel.hidden = false;
+        }
+
+        function hideResult() {
+            resultPanel.hidden = true;
+        }
+
+        function buyLot(index) {
+            const lot = state.lots[index];
+
+            if (lot.bid > state.cash) {
+                setMessage("You do not have enough cash for this lot. 这批货柜的叫价超过了你的现金，先刷新或攒更多利润。", "warn");
+                return;
+            }
+
+            state.cash -= lot.bid;
+            const sale = lot.resaleValue;
+            const profit = sale - lot.bid;
+            state.cash += sale;
+            state.opened += 1;
+
+            state.history.unshift({
+                nameZh: lot.nameZh,
+                nameEn: lot.nameEn,
+                bid: lot.bid,
+                sale,
+                profit,
+            });
+            state.history = state.history.slice(0, MAX_HISTORY_ENTRIES);
+
+            renderStats();
+            renderHistory();
+            showResult(lot, sale, profit);
+            setMessage(`Bought "${lot.nameEn}" and cleared a profit of ${formatMoney(profit)}. 你成功拍下「${lot.nameZh}」，清仓后赚到了 ${formatMoney(profit)}。`, "good");
+            lotGrid.innerHTML = "";
+        }
+
+        function startNextRound() {
+            state.round += 1;
+            generateLots();
+            renderStats();
+            renderLots();
+            hideResult();
+            setMessage("A fresh wave of lots has arrived. 新一批随机集装箱已经到港，继续用利润滚动出价吧。");
+        }
+
+        rerollButton.addEventListener("click", () => {
+            generateLots();
+            renderLots();
+            hideResult();
+            setMessage("Lots refreshed with new clues. 已刷新本轮拍卖，新的随机线索已出现。");
+        });
+
+        nextRoundButton.addEventListener("click", startNextRound);
+
+        generateLots();
+        renderStats();
+        renderLots();
+        renderHistory();
+        setMessage("You have seed money ready to deploy. 你有一笔启动资金，先挑一个看起来最值钱的集装箱试试手气。");
+    </script>
+</body>
+</html>
