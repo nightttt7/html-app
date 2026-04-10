@@ -862,7 +862,7 @@
         }
 
         function localize(zhText, enText) {
-            return state.language === "zh" ? zhText : enText;
+            return state.language === "zh" ? (zhText || enText || "") : (enText || zhText || "");
         }
 
         function localizePairText(text) {
@@ -897,6 +897,10 @@
 
             state.language = language;
             render();
+        }
+
+        function formatRoundLabel(round) {
+            return localize(`第 ${round} 天`, `D${round}`);
         }
 
         function randomInt(min, max) {
@@ -1189,7 +1193,7 @@
             roundValue.textContent = state.round;
             licenseValue.textContent = formatMoney(getDiscountedLicenseFee());
             mobileCashValue.textContent = formatMoney(state.cash);
-            mobileRoundValue.textContent = localize(`第 ${state.round} 天`, `D${state.round}`);
+            mobileRoundValue.textContent = formatRoundLabel(state.round);
             mobileLicenseValue.textContent = formatMoney(getDiscountedLicenseFee());
         }
 
