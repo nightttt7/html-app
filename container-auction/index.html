@@ -636,9 +636,10 @@
                 nameEn: "Quick Cashback",
                 nameZh: "速返现金",
                 cost: 0,
+                value: 360,
                 description: "Gain ¥360 immediately. / 立刻获得 ¥360。",
                 apply() {
-                    state.cash += 360;
+                    state.cash += this.value;
                 },
             },
             {
@@ -717,7 +718,8 @@
                 return 0;
             }
 
-            return Math.round(BASE_LICENSE_FEE * Math.pow(LICENSE_GROWTH, round - 2) + (round - 2) * LICENSE_STEP);
+            const elapsedRounds = round - 2;
+            return Math.round(BASE_LICENSE_FEE * Math.pow(LICENSE_GROWTH, elapsedRounds) + elapsedRounds * LICENSE_STEP);
         }
 
         function appraisedGrowth(round) {
@@ -739,7 +741,7 @@
             const itemCount = randomInt(2, 4);
             const chosenItems = shuffle(template.items).slice(0, itemCount);
             const items = chosenItems.map((item) => ({
-                id: state.itemId += 1,
+                id: ++state.itemId,
                 name: item.name,
                 appraisal: Math.round(randomInt(item.min, item.max) * appraisedGrowth(state.round)),
                 storageFee: item.storage,
@@ -1092,7 +1094,6 @@
             state.chosenLotName = "";
             state.marketBoostToday = state.nextMarketBoost;
             state.nextMarketBoost = 0;
-            state.nextLotDiscount = Math.max(state.nextLotDiscount, 0);
             buildMarketTable();
             refreshInventoryPrices();
             generateLots();
@@ -1197,7 +1198,7 @@
             addHistory(
                 `Day ${state.round} reward: ${reward.nameEn}`,
                 `${reward.nameZh} · ${reward.description}`,
-                reward.id === "cash" ? 360 : reward.cost > 0 ? -reward.cost : null,
+                reward.id === "cash" ? reward.value : reward.cost > 0 ? -reward.cost : null,
             );
             state.phase = "next";
             setMessage(`Reward locked: ${reward.nameZh}. Finish the day when ready. 奖励已生效：${reward.nameZh}，准备好后进入下一天。`, reward.id === "cash" ? "good" : "info");
