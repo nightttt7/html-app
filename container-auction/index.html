@@ -362,6 +362,12 @@
 
     <script>
         const startingCash = 1800;
+        const MIN_BID_PRICE = 120;
+        const MIN_RESERVE_RATIO = 0.52;
+        const RESERVE_RATIO_VARIANCE = 0.16;
+        const MIN_PROFIT_MARGIN = 40;
+        const AFFORDABLE_BID_RATIO = 0.72;
+        const MAX_HISTORY_ENTRIES = 6;
         const state = {
             cash: startingCash,
             round: 1,
@@ -475,7 +481,10 @@
                 value: randomInt(item.min, item.max),
             }));
             const resaleValue = items.reduce((sum, item) => sum + item.value, 0);
-            const reservePrice = Math.max(120, Math.floor(resaleValue * (0.52 + Math.random() * 0.16)));
+            const reservePrice = Math.max(
+                MIN_BID_PRICE,
+                Math.floor(resaleValue * (MIN_RESERVE_RATIO + Math.random() * RESERVE_RATIO_VARIANCE)),
+            );
 
             return {
                 nameZh: template.nameZh,
@@ -485,7 +494,7 @@
                 hints: template.hints,
                 items,
                 resaleValue,
-                bid: Math.min(reservePrice, resaleValue - 40),
+                bid: Math.min(reservePrice, resaleValue - MIN_PROFIT_MARGIN),
             };
         }
 
@@ -494,7 +503,7 @@
 
             if (state.lots.every((lot) => lot.bid > state.cash)) {
                 state.lots.sort((left, right) => left.bid - right.bid);
-                state.lots[0].bid = Math.max(120, Math.floor(state.cash * 0.72));
+                state.lots[0].bid = Math.max(MIN_BID_PRICE, Math.floor(state.cash * AFFORDABLE_BID_RATIO));
             }
         }
 
@@ -604,7 +613,7 @@
                 sale,
                 profit,
             });
-            state.history = state.history.slice(0, 6);
+            state.history = state.history.slice(0, MAX_HISTORY_ENTRIES);
 
             renderStats();
             renderHistory();
