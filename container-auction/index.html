@@ -361,7 +361,7 @@
     </main>
 
     <script>
-        const startingCash = 1800;
+        const STARTING_CASH = 1800;
         const MIN_BID_PRICE = 120;
         const MIN_RESERVE_RATIO = 0.52;
         const RESERVE_RATIO_VARIANCE = 0.16;
@@ -369,7 +369,7 @@
         const AFFORDABLE_BID_RATIO = 0.72;
         const MAX_HISTORY_ENTRIES = 6;
         const state = {
-            cash: startingCash,
+            cash: STARTING_CASH,
             round: 1,
             opened: 0,
             lots: [],
@@ -472,10 +472,21 @@
             return containerTemplates[randomInt(0, containerTemplates.length - 1)];
         }
 
+        function shuffleItems(items) {
+            const shuffled = [...items];
+
+            for (let index = shuffled.length - 1; index > 0; index -= 1) {
+                const swapIndex = randomInt(0, index);
+                [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+            }
+
+            return shuffled;
+        }
+
         function buildLot() {
             const template = pickTemplate();
             const itemCount = randomInt(2, 4);
-            const shuffled = [...template.items].sort(() => Math.random() - 0.5).slice(0, itemCount);
+            const shuffled = shuffleItems(template.items).slice(0, itemCount);
             const items = shuffled.map((item) => ({
                 name: item.name,
                 value: randomInt(item.min, item.max),
@@ -514,7 +525,7 @@
 
         function renderStats() {
             cashValue.textContent = formatMoney(state.cash);
-            profitValue.textContent = formatMoney(state.cash - startingCash);
+            profitValue.textContent = formatMoney(state.cash - STARTING_CASH);
             openedValue.textContent = state.opened;
             roundValue.textContent = state.round;
         }
