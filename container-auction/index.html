@@ -109,6 +109,10 @@
             grid-template-columns: repeat(6, minmax(0, 1fr));
             gap: 14px;
             margin: 24px 0;
+            padding: 14px;
+            background: #0b1120;
+            border-radius: var(--radius);
+            border: 1px solid rgba(148, 163, 184, 0.22);
         }
 
         .mobile-status {
@@ -124,9 +128,9 @@
         .mobile-chip {
             padding: 10px 12px;
             border-radius: 18px;
-            border: 1px solid var(--line);
-            background: rgba(15, 23, 42, 0.88);
-            box-shadow: 0 12px 24px rgba(2, 6, 23, 0.2);
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: #0b1120;
+            box-shadow: 0 4px 12px rgba(2, 6, 23, 0.55);
         }
 
         .mobile-chip span {
@@ -160,6 +164,7 @@
 
         .stat-card {
             padding: 18px 20px;
+            background: rgba(15, 23, 42, 0.92) !important;
         }
 
         .stat-label {
@@ -428,6 +433,42 @@
             color: var(--muted);
         }
 
+        .rules-toggle {
+            margin: 0;
+        }
+
+        .rules-toggle summary {
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 0.88rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            list-style: none;
+            padding: 6px 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+
+        .rules-toggle summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .rules-toggle summary::after {
+            content: '▸';
+            font-size: 0.8rem;
+            transition: transform 160ms ease;
+        }
+
+        .rules-toggle[open] summary::after {
+            content: '▾';
+        }
+
+        .rules-toggle .subtitle {
+            margin-top: 10px;
+        }
+
         .floating-day-button {
             position: fixed;
             right: 24px;
@@ -505,7 +546,10 @@
                 </div>
             </div>
             <h1 id="heroTitle">集装箱竞拍站</h1>
-            <p class="subtitle" id="heroSubtitle">按天推进：每天只能从几只柜子里选一只买下，或直接跳过；卖货是逐件卖；准备收工时点击“结束今天”，再挑一条奖励，最后进入下一天。</p>
+            <details class="rules-toggle" id="rulesToggle">
+                <summary id="rulesSummary">游戏说明</summary>
+                <p class="subtitle" id="heroSubtitle">按天推进：先买柜子（不能卖货），再卖货，然后结束当天（需要有足够钱支付牌照费），系统扣费后进入选奖励，奖励选好后自动进入下一天。现金达到 ¥10,000 即获胜。</p>
+            </details>
         </section>
 
         <section class="mobile-status">
@@ -519,8 +563,8 @@
                     <strong id="mobileRoundValue">D1</strong>
                 </article>
                 <article class="mobile-chip">
-                    <span id="mobilePhaseLabel">阶段</span>
-                    <strong id="mobilePhaseValue">拍卖</strong>
+                    <span id="mobileInvLabel">库存卖价</span>
+                    <strong id="mobileInvValue">¥0</strong>
                 </article>
                 <article class="mobile-chip">
                     <span id="mobileLicenseLabel">牌照</span>
@@ -539,12 +583,12 @@
                 <strong class="stat-value" id="netWorthValue">¥0</strong>
             </article>
             <article class="stat-card">
-                <span class="stat-label" id="inventoryLabel">仓库件数</span>
-                <strong class="stat-value" id="inventoryValue">0</strong>
+                <span class="stat-label" id="inventoryLabel">库存估价</span>
+                <strong class="stat-value" id="inventoryValue">¥0</strong>
             </article>
             <article class="stat-card">
-                <span class="stat-label" id="openedLabel">已开箱柜</span>
-                <strong class="stat-value" id="openedValue">0</strong>
+                <span class="stat-label" id="openedLabel">当日卖价</span>
+                <strong class="stat-value" id="openedValue">¥0</strong>
             </article>
             <article class="stat-card">
                 <span class="stat-label" id="roundLabel">当前天数</span>
@@ -588,14 +632,15 @@
                         <button class="skip-button" id="skipRewardButton">放弃奖励</button>
                     </div>
                 </section>
-                <p class="footer-note" id="footerNote">胜利条件是现金先冲到 ¥10,000；进入下一天会自动扣仓储和牌照费，扣完牌照后没钱就直接失败。</p>
             </section>
 
             <aside class="panel">
                 <h2 id="warehouseLogTitle">仓库与经营记录</h2>
-                <p id="warehouseLogIntro">开出来的货物都会进自己的仓库；你可以今天逐件卖，也可以付比较便宜的仓储费等以后更好的价格。</p>
-                <div class="warehouse-list" id="warehouseList" style="margin-top: 18px;"></div>
-                <div class="small" id="warehouseSummary" style="margin-top: 14px;"></div>
+                <div id="warehouseContent">
+                    <p id="warehouseLogIntro">开出来的货物都会进自己的仓库；你可以今天逐件卖，也可以付比较便宜的仓储费等以后更好的价格。</p>
+                    <div class="warehouse-list" id="warehouseList" style="margin-top: 18px;"></div>
+                    <div class="small" id="warehouseSummary" style="margin-top: 14px;"></div>
+                </div>
 
                 <h3 style="margin-top: 26px;" id="historyTitle">经营记录</h3>
                 <div class="history-list" id="historyList"></div>
@@ -605,7 +650,7 @@
     <button class="floating-day-button" id="dayActionButton" type="button">结束今天</button>
 
     <script>
-        const STARTING_CASH = 2200;
+        const STARTING_CASH = 2800;
         const WIN_CASH = 10000;
         const MIN_BID_PRICE = 180;
         const CONTAINER_GROWTH = 1.055;
@@ -613,9 +658,9 @@
         const MIN_MARKET_MULTIPLIER = 0.48;
         const MAX_MARKET_MULTIPLIER = 2.15;
         const MAX_HISTORY_ENTRIES = 10;
-        const BASE_LICENSE_FEE = 230;
-        const LICENSE_GROWTH = 1.18;
-        const LICENSE_STEP = 30;
+        const BASE_LICENSE_FEE = 200;
+        const LICENSE_GROWTH = 1.13;
+        const LICENSE_STEP = 25;
 
         const state = {
             cash: STARTING_CASH,
@@ -817,8 +862,8 @@
         const mobileCashValue = document.getElementById("mobileCashValue");
         const mobileRoundLabel = document.getElementById("mobileRoundLabel");
         const mobileRoundValue = document.getElementById("mobileRoundValue");
-        const mobilePhaseLabel = document.getElementById("mobilePhaseLabel");
-        const mobilePhaseValue = document.getElementById("mobilePhaseValue");
+        const mobileInvLabel = document.getElementById("mobileInvLabel");
+        const mobileInvValue = document.getElementById("mobileInvValue");
         const mobileLicenseLabel = document.getElementById("mobileLicenseLabel");
         const mobileLicenseValue = document.getElementById("mobileLicenseValue");
         const cashLabel = document.getElementById("cashLabel");
@@ -847,11 +892,11 @@
         const rewardIntro = document.getElementById("rewardIntro");
         const warehouseLogTitle = document.getElementById("warehouseLogTitle");
         const warehouseLogIntro = document.getElementById("warehouseLogIntro");
+        const warehouseContent = document.getElementById("warehouseContent");
         const warehouseList = document.getElementById("warehouseList");
         const warehouseSummary = document.getElementById("warehouseSummary");
         const historyTitle = document.getElementById("historyTitle");
         const historyList = document.getElementById("historyList");
-        const footerNote = document.getElementById("footerNote");
         const messageBox = document.getElementById("messageBox");
         const skipAuctionButton = document.getElementById("skipAuctionButton");
         const skipRewardButton = document.getElementById("skipRewardButton");
@@ -1080,13 +1125,13 @@
             }
 
             if (state.phase === "sales") {
+                const licenseFee = getDiscountedLicenseFee();
+                const storageFee = calculateStorageFee();
                 return {
                     badgeZh: "卖货",
                     badgeEn: "Sales",
-                    shortZh: "卖货",
-                    shortEn: "Sell",
-                    summaryZh: "现在可以逐件卖，也可以留到明天继续囤；准备收工时点“结束今天”。",
-                    summaryEn: "Sell item by item, or hold for tomorrow and tap “End Today” when ready.",
+                    summaryZh: `逐件卖货或留到下一天；结束今天需要至少 ${formatMoney(licenseFee)} 支付牌照费（仓储 ${formatMoney(storageFee)}）。`,
+                    summaryEn: `Sell items or hold. Ending today requires ${formatMoney(licenseFee)} for the license fee (storage ${formatMoney(storageFee)}).`,
                 };
             }
 
@@ -1094,20 +1139,16 @@
                 return {
                     badgeZh: "奖励",
                     badgeEn: "Reward",
-                    shortZh: "奖励",
-                    shortEn: "Reward",
-                    summaryZh: "结束今天后，现在最多选一条奖励，也可以直接放弃。",
-                    summaryEn: "Day closed. Pick one reward now, or skip it.",
+                    summaryZh: "费用已结算，选一条奖励后自动进入下一天，也可以直接放弃。",
+                    summaryEn: "Fees settled. Pick one reward then the next day starts, or skip it.",
                 };
             }
 
             return {
-                badgeZh: "下一天",
-                badgeEn: "Next Day",
-                shortZh: "明天",
-                shortEn: "Next",
-                summaryZh: `进入下一天会扣除仓储 ${formatMoney(calculateStorageFee())} 和牌照 ${formatMoney(getDiscountedLicenseFee())}。`,
-                summaryEn: `Starting the next day deducts ${formatMoney(calculateStorageFee())} storage and ${formatMoney(getDiscountedLicenseFee())} license.`,
+                badgeZh: "结束",
+                badgeEn: "Done",
+                summaryZh: "本局已结束。",
+                summaryEn: "Run complete.",
             };
         }
 
@@ -1132,27 +1173,30 @@
             heroEyebrow.textContent = localize("单页 HTML 游戏 Demo", "Single-file HTML game demo");
             heroTitle.textContent = localize("集装箱竞拍站", "Container Auction");
             heroSubtitle.textContent = localize(
-                "按天推进：每天只能从几只柜子里选一只买下，或直接跳过；卖货是逐件卖；准备收工时点击“结束今天”，再挑一条奖励，最后进入下一天。",
-                "Play day by day: buy one container or skip, sell warehouse items one by one, tap “End Today” when ready, then choose one reward before the next day.",
+                "按天推进：先买柜子（不能卖货），再卖货，然后结束当天（需要有足够钱支付牌照费），系统扣费后进入选奖励，奖励选好后自动进入下一天。现金达到 ¥10,000 即获胜。",
+                "Each day: buy a container (selling disabled), then sell goods, then end the day (must afford the license fee). Fees are deducted, then pick a reward. Next day starts automatically.",
             );
+            document.getElementById("rulesSummary").textContent = localize("游戏说明", "How to Play");
 
             cashLabel.textContent = localize("当前现金", "Cash");
             netWorthLabel.textContent = localize("总资产", "Net Worth");
-            inventoryLabel.textContent = localize("仓库件数", "Warehouse");
-            openedLabel.textContent = localize("已开箱柜", "Containers");
+            inventoryLabel.textContent = localize("库存估价", "Appraisal");
+            openedLabel.textContent = localize("当日卖价", "Sell Value");
             roundLabel.textContent = localize("当前天数", "Day");
-            licenseLabel.textContent = localize("下轮牌照费", "Next License");
+            licenseLabel.textContent = localize("牌照费", "License");
 
             mobileCashLabel.textContent = localize("现金", "Cash");
             mobileRoundLabel.textContent = localize("天数", "Day");
-            mobilePhaseLabel.textContent = localize("阶段", "Phase");
+            mobileInvLabel.textContent = localize("库存卖价", "Inv. Value");
             mobileLicenseLabel.textContent = localize("牌照", "Fee");
 
-            auctionTitle.textContent = localize("今日竞拍", "Daily Auction");
-            auctionIntro.textContent = localize(
-                "每天只能买一只柜子，或者选择不买；卖货阶段可以逐件卖；准备收工时结束今天，再挑一条额外奖励。",
-                "Buy one lot or skip. Sell warehouse items one by one, then end the day and choose one extra reward.",
-            );
+            const phaseTitles = {
+                auction: localize("今日竞拍", "Daily Auction"),
+                sales: localize("今日卖货", "Today's Sales"),
+                reward: localize("选择奖励", "Choose Reward"),
+            };
+            auctionTitle.textContent = phaseTitles[state.phase] || localize("今日操作", "Action");
+            auctionIntro.hidden = true;
             phaseTitle.textContent = localize("当前阶段", "Current Phase");
             rewardTitle.textContent = localize("额外奖励", "Extra Reward");
             rewardLimitTag.textContent = localize("最多选一条", "Choose one");
@@ -1160,16 +1204,7 @@
                 "奖励有的免费有的要花钱，通常会影响下一天，也可能直接给你现金。",
                 "Rewards may be free, cost cash, affect tomorrow, or pay out cash instantly.",
             );
-            warehouseLogTitle.textContent = localize("仓库与经营记录", "Warehouse & Log");
-            warehouseLogIntro.textContent = localize(
-                "开出来的货物都会进自己的仓库；你可以今天逐件卖，也可以付比较便宜的仓储费等以后更好的价格。",
-                "Opened goods go into storage. Sell them today or hold them for a later price spike and pay storage.",
-            );
             historyTitle.textContent = localize("经营记录", "History");
-            footerNote.textContent = localize(
-                "胜利条件是现金先冲到 ¥10,000；进入下一天会自动扣仓储和牌照费，扣完牌照后没钱就直接失败。",
-                "Reach ¥10,000 cash to win. Starting a new day auto-deducts storage and license costs; if the license leaves you broke, the run ends.",
-            );
 
             skipAuctionButton.textContent = localize("今天不买", "Skip Buying");
             skipRewardButton.textContent = localize("放弃奖励", "Skip Reward");
@@ -1179,14 +1214,17 @@
         }
 
         function renderStats() {
+            const appraisalTotal = state.inventory.reduce((sum, item) => sum + item.appraisal, 0);
+            const currentTotal = state.inventory.reduce((sum, item) => sum + item.currentPrice, 0);
             cashValue.textContent = formatMoney(state.cash);
             netWorthValue.textContent = formatMoney(calculateNetWorth());
-            inventoryValue.textContent = state.inventory.length;
-            openedValue.textContent = state.opened;
+            inventoryValue.textContent = formatMoney(appraisalTotal);
+            openedValue.textContent = formatMoney(currentTotal);
             roundValue.textContent = state.round;
             licenseValue.textContent = formatMoney(getDiscountedLicenseFee());
             mobileCashValue.textContent = formatMoney(state.cash);
             mobileRoundValue.textContent = formatDayLabel(state.round);
+            mobileInvValue.textContent = formatMoney(currentTotal);
             mobileLicenseValue.textContent = formatMoney(getDiscountedLicenseFee());
         }
 
@@ -1244,6 +1282,10 @@
 
         function renderLots() {
             lotGrid.innerHTML = "";
+
+            if (state.phase !== "auction" || state.gameOver || state.victory) {
+                return;
+            }
 
             state.lots.forEach((lot, index) => {
                 const card = document.createElement("article");
@@ -1389,9 +1431,21 @@
             const meta = getPhaseMeta();
             phaseBadge.textContent = localize(meta.badgeZh, meta.badgeEn);
             phaseSummary.textContent = localize(meta.summaryZh, meta.summaryEn);
-            mobilePhaseValue.textContent = localize(meta.shortZh, meta.shortEn);
-            skipAuctionButton.disabled = state.phase !== "auction" || state.gameOver || state.victory;
+
+            const isAuction = state.phase === "auction" && !state.gameOver && !state.victory;
+            skipAuctionButton.hidden = !isAuction;
+            skipAuctionButton.disabled = !isAuction;
             skipRewardButton.disabled = state.phase !== "reward" || state.gameOver || state.victory;
+
+            // Show/hide warehouse content based on phase
+            const showWarehouse = state.phase === "sales" && !state.gameOver && !state.victory;
+            warehouseContent.hidden = !showWarehouse;
+            warehouseLogTitle.textContent = showWarehouse
+                ? localize("仓库", "Warehouse")
+                : localize("经营记录", "History");
+
+            // Show/hide lot grid: only during auction phase
+            lotGrid.hidden = state.phase !== "auction" || state.gameOver || state.victory;
         }
 
         function renderDayAction() {
@@ -1400,23 +1454,10 @@
                 return;
             }
 
-            dayActionButton.hidden = false;
-
-            if (state.phase === "auction" || state.phase === "sales") {
+            if (state.phase === "sales") {
+                dayActionButton.hidden = false;
                 dayActionButton.disabled = false;
                 dayActionButton.textContent = localize("结束今天", "End Today");
-                return;
-            }
-
-            if (state.phase === "reward") {
-                dayActionButton.disabled = true;
-                dayActionButton.textContent = localize("先选奖励", "Pick Reward");
-                return;
-            }
-
-            if (state.phase === "next") {
-                dayActionButton.disabled = false;
-                dayActionButton.textContent = localize("进入下一天", "Next Day");
                 return;
             }
 
@@ -1553,34 +1594,74 @@
         }
 
         function endToday() {
-            if (state.gameOver || state.victory) {
+            if (state.gameOver || state.victory || state.phase !== "sales") {
                 return;
             }
 
-            if (state.phase === "auction") {
-                state.nextLotDiscount = 0;
-                addHistory(
-                    `第 ${state.round} 天跳过竞拍`,
-                    `Day ${state.round} skipped the auction`,
-                    "今天没有买柜子，直接收工",
-                    "No container bought before ending the day",
-                );
+            const licenseFee = getDiscountedLicenseFee();
+
+            if (state.cash < licenseFee) {
+                if (state.inventory.length === 0) {
+                    endRun(
+                        "卖完所有货物依然付不起牌照费，本局失败。",
+                        "Sold everything but still can't cover the license fee. Run over.",
+                    );
+                } else {
+                    setMessage(
+                        `现金不足以支付牌照费 ${formatMoney(licenseFee)}，请先卖货凑钱（仓库还有 ${state.inventory.length} 件）。`,
+                        `Need ${formatMoney(licenseFee)} for the license fee. Sell more goods first (${state.inventory.length} item(s) left).`,
+                        "warn",
+                    );
+                    render();
+                }
+                return;
             }
 
-            if (state.phase === "auction" || state.phase === "sales") {
-                state.phase = "reward";
+            const storageFee = state.nextStorageFree ? 0 : calculateStorageFee();
+            state.cash -= storageFee;
+            state.cash -= licenseFee;
+            state.nextStorageFree = false;
+            state.nextLicenseDiscount = 0;
+
+            addHistory(
+                `第 ${state.round} 天结算`,
+                `Day ${state.round} settlement`,
+                `仓储 ${formatMoney(storageFee)} · 牌照 ${formatMoney(licenseFee)}`,
+                `Storage ${formatMoney(storageFee)} · License ${formatMoney(licenseFee)}`,
+                -(storageFee + licenseFee),
+            );
+
+            if (state.cash < 0) {
+                endRun("结算费用后资金不足，本局失败。", "Settlement deducted too much. Run over.");
+                return;
+            }
+
+            state.phase = "reward";
+            setMessage(
+                "今天收工，费用已结算，选一条奖励后自动进入下一天（也可放弃）。",
+                "Day closed and fees settled. Pick a reward to continue, or skip it.",
+                "info",
+            );
+            render();
+        }
+
+        function advanceToNextDay(rewardNameZh = null, rewardNameEn = null) {
+            state.round += 1;
+            startDay();
+            if (rewardNameZh) {
                 setMessage(
-                    "今天收工了，现在可以最多选一条奖励。",
-                    "Today is wrapped. Pick one reward now, or skip it.",
+                    `第 ${state.round} 天开始，奖励「${rewardNameZh}」已生效。`,
+                    `Day ${state.round} begins. Reward "${rewardNameEn}" is active.`,
                     "info",
                 );
-                render();
-                return;
+            } else {
+                setMessage(
+                    `第 ${state.round} 天开始。`,
+                    `Day ${state.round} begins.`,
+                    "info",
+                );
             }
-
-            if (state.phase === "next") {
-                goToNextDay();
-            }
+            render();
         }
 
         function chooseReward(rewardId) {
@@ -1606,14 +1687,12 @@
                 `${reward.nameEn} · ${rewardDescription.en}`,
                 reward.id === "cash" ? reward.value : reward.cost > 0 ? -reward.cost : null,
             );
-            state.phase = "next";
-            setMessage(
-                `奖励已生效：${reward.nameZh}，现在可以进入下一天。`,
-                `Reward locked: ${reward.nameEn}. You can start the next day now.`,
-                reward.id === "cash" ? "good" : "info",
-            );
-            render();
-            checkForVictory();
+
+            if (checkForVictory()) {
+                return;
+            }
+
+            advanceToNextDay(reward.nameZh, reward.nameEn);
         }
 
         function skipReward() {
@@ -1621,61 +1700,20 @@
                 return;
             }
 
-            state.phase = "next";
             addHistory(
                 `第 ${state.round} 天放弃奖励`,
                 `Day ${state.round} skipped reward`,
                 "今天没有拿额外奖励",
                 "No extra reward chosen today",
             );
-            setMessage(
-                "你放弃了今天的额外奖励，现在可以进入下一天。",
-                "No reward taken. You can advance to the next day now.",
-                "info",
-            );
-            render();
+
+            advanceToNextDay();
         }
 
         function endRun(zhText, enText) {
             state.gameOver = true;
             state.phase = "done";
             setMessage(zhText, enText, "warn");
-            render();
-        }
-
-        function goToNextDay() {
-            if (state.phase !== "next" || state.gameOver || state.victory) {
-                return;
-            }
-
-            const storageFee = state.nextStorageFree ? 0 : calculateStorageFee();
-            const nextRound = state.round + 1;
-            const licenseFee = getDiscountedLicenseFee();
-
-            state.cash -= storageFee;
-            state.cash -= licenseFee;
-            addHistory(
-                `第 ${state.round} 天夜间结算`,
-                `Night ${state.round} deductions`,
-                `仓储 ${formatMoney(storageFee)} · 牌照 ${formatMoney(licenseFee)}`,
-                `Storage ${formatMoney(storageFee)} · License ${formatMoney(licenseFee)}`,
-                -(storageFee + licenseFee),
-            );
-            state.nextStorageFree = false;
-            state.nextLicenseDiscount = 0;
-
-            if (state.cash <= 0) {
-                endRun("牌照费结算后资金归零，本局失败。", "The next day's license finished you off.");
-                return;
-            }
-
-            state.round = nextRound;
-            startDay();
-            setMessage(
-                `第 ${state.round} 天开始了，昨夜仓储扣了 ${formatMoney(storageFee)}，牌照扣了 ${formatMoney(licenseFee)}。`,
-                `Day ${state.round} begins. Overnight costs were ${formatMoney(storageFee)} and the license was ${formatMoney(licenseFee)}.`,
-                "info",
-            );
             render();
         }
 
