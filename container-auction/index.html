@@ -37,7 +37,7 @@
         }
 
         .page {
-            width: min(1160px, calc(100% - 32px));
+            width: min(1180px, calc(100% - 32px));
             margin: 24px auto;
             padding: 28px;
             border: 1px solid rgba(148, 163, 184, 0.16);
@@ -69,7 +69,7 @@
         }
 
         .subtitle {
-            max-width: 62ch;
+            max-width: 70ch;
             margin: 0;
             color: var(--muted);
             line-height: 1.7;
@@ -77,7 +77,7 @@
 
         .stats {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(6, minmax(0, 1fr));
             gap: 14px;
             margin: 24px 0;
         }
@@ -86,6 +86,9 @@
         .panel,
         .lot-card,
         .history-item,
+        .warehouse-item,
+        .reward-card,
+        .section-block,
         .item-chip {
             border: 1px solid var(--line);
             background: var(--card);
@@ -104,13 +107,13 @@
         }
 
         .stat-value {
-            font-size: clamp(1.4rem, 3vw, 2.2rem);
+            font-size: clamp(1.25rem, 2.8vw, 2rem);
             font-weight: 800;
         }
 
         .layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.8fr);
+            grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.95fr);
             gap: 20px;
         }
 
@@ -130,14 +133,74 @@
             line-height: 1.6;
         }
 
-        .lot-grid {
+        .section-block {
+            padding: 18px;
+            margin-top: 18px;
+            background: rgba(15, 23, 42, 0.5);
+        }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .phase-badge,
+        .lot-tag,
+        .reward-tag,
+        .market-tag {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .phase-badge,
+        .lot-tag {
+            background: rgba(245, 158, 11, 0.12);
+            color: #fdba74;
+        }
+
+        .reward-tag {
+            background: rgba(56, 189, 248, 0.14);
+            color: #bae6fd;
+        }
+
+        .market-tag.good {
+            background: rgba(34, 197, 94, 0.14);
+            color: #bbf7d0;
+        }
+
+        .market-tag.warn {
+            background: rgba(251, 113, 133, 0.14);
+            color: #fecdd3;
+        }
+
+        .market-tag.neutral {
+            background: rgba(148, 163, 184, 0.16);
+            color: #e2e8f0;
+        }
+
+        .lot-grid,
+        .reward-grid,
+        .warehouse-list,
+        .history-list,
+        .hint-list {
             display: grid;
+            gap: 14px;
+        }
+
+        .lot-grid,
+        .reward-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 16px;
             margin-top: 18px;
         }
 
-        .lot-card {
+        .lot-card,
+        .reward-card,
+        .warehouse-item {
             padding: 18px;
             display: grid;
             gap: 14px;
@@ -145,42 +208,35 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
         }
 
-        .lot-top {
+        .lot-top,
+        .warehouse-top,
+        .reward-top,
+        .history-head,
+        .action-row,
+        .result-row {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
+            gap: 10px;
             align-items: flex-start;
+            flex-wrap: wrap;
         }
 
-        .lot-tag {
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: rgba(245, 158, 11, 0.12);
-            color: #fdba74;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
-
-        .lot-name {
+        .lot-name,
+        .warehouse-name {
             margin: 0;
-            font-size: 1.15rem;
+            font-size: 1.1rem;
         }
 
-        .lot-subtitle {
-            margin-top: 4px;
+        .small {
+            color: var(--muted);
+            font-size: 0.9rem;
         }
 
-        .lot-price {
-            font-size: 1.7rem;
+        .lot-price,
+        .warehouse-price {
+            font-size: 1.55rem;
             font-weight: 800;
             color: white;
-        }
-
-        .hint-list,
-        .item-list,
-        .history-list {
-            display: grid;
-            gap: 10px;
         }
 
         .hint-list {
@@ -193,12 +249,16 @@
             line-height: 1.5;
         }
 
-        .action-row,
-        .result-row {
-            display: flex;
-            flex-wrap: wrap;
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 10px;
-            align-items: center;
+        }
+
+        .meta-box {
+            padding: 10px 12px;
+            border-radius: 18px;
+            background: rgba(148, 163, 184, 0.1);
         }
 
         button {
@@ -221,19 +281,23 @@
         }
 
         .bid-button,
-        .next-button {
+        .next-button,
+        .sell-button,
+        .reward-button {
             background: linear-gradient(135deg, var(--accent), var(--accent-strong));
             color: #1c1917;
         }
 
-        .reroll-button {
+        .ghost-button,
+        .skip-button,
+        .phase-button {
             background: rgba(148, 163, 184, 0.14);
             color: var(--text);
             border: 1px solid var(--line);
         }
 
         .message {
-            margin-top: 16px;
+            margin-top: 14px;
             padding: 14px 16px;
             border-radius: 18px;
             background: rgba(148, 163, 184, 0.12);
@@ -251,19 +315,9 @@
             color: #fecdd3;
         }
 
-        .result-panel {
-            margin-top: 18px;
-            padding: 18px;
-            border-radius: 22px;
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-        }
-
-        .item-chip {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 12px 14px;
+        .message.info {
+            background: rgba(56, 189, 248, 0.12);
+            color: #bae6fd;
         }
 
         .profit {
@@ -274,26 +328,47 @@
             color: #86efac;
         }
 
+        .profit.negative {
+            color: #fda4af;
+        }
+
         .history-item {
             padding: 14px;
             background: rgba(15, 23, 42, 0.45);
         }
 
-        .history-head {
+        .history-list {
+            margin-top: 18px;
+        }
+
+        .effect-list {
             display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .item-chip {
+            padding: 10px 12px;
+            background: rgba(56, 189, 248, 0.08);
+        }
+
+        .warehouse-actions {
+            display: flex;
             gap: 10px;
-            margin-bottom: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
         }
 
-        .small {
+        .footer-note {
+            margin-top: 14px;
             color: var(--muted);
-            font-size: 0.9rem;
         }
 
-        @media (max-width: 980px) {
+        @media (max-width: 1080px) {
             .stats,
             .lot-grid,
+            .reward-grid,
             .layout {
                 grid-template-columns: 1fr;
             }
@@ -305,7 +380,7 @@
         <section class="hero">
             <p class="eyebrow">HTML Demo / 单页 HTML 游戏 Demo</p>
             <h1>Container Auction / 集装箱竞拍站</h1>
-            <p class="subtitle">Start with seed money, bid on random containers, then flip the hidden goods for profit. 用一笔启动资金参加港口盲拍，每回合从 3 个随机集装箱里挑一个出价，卖出货物后继续滚动资金。</p>
+            <p class="subtitle">The game now runs day by day: each day you may buy exactly one container or skip, sell warehouse items one by one, choose at most one extra reward, then pay overnight costs and the next license fee before the next day begins. 现在改成按天推进：每天只能从几只柜子里选一只买下，或直接跳过；卖货是逐件卖；卖完后还能选一条额外奖励，然后再进入下一天。</p>
         </section>
 
         <section class="stats">
@@ -314,66 +389,112 @@
                 <strong class="stat-value" id="cashValue">¥0</strong>
             </article>
             <article class="stat-card">
-                <span class="stat-label">Profit / 累计利润</span>
-                <strong class="stat-value" id="profitValue">¥0</strong>
+                <span class="stat-label">Net Worth / 总资产</span>
+                <strong class="stat-value" id="netWorthValue">¥0</strong>
             </article>
             <article class="stat-card">
-                <span class="stat-label">Containers / 已竞拍集装箱</span>
+                <span class="stat-label">Warehouse / 仓库件数</span>
+                <strong class="stat-value" id="inventoryValue">0</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Containers / 已开箱柜</span>
                 <strong class="stat-value" id="openedValue">0</strong>
             </article>
             <article class="stat-card">
-                <span class="stat-label">Round / 当前回合</span>
+                <span class="stat-label">Day / 当前天数</span>
                 <strong class="stat-value" id="roundValue">1</strong>
+            </article>
+            <article class="stat-card">
+                <span class="stat-label">Next License / 下轮牌照费</span>
+                <strong class="stat-value" id="licenseValue">¥0</strong>
             </article>
         </section>
 
         <section class="layout">
             <section class="panel">
-                <h2>Random Lots / 正在拍卖的随机集装箱</h2>
-                <p>Each purchase refreshes the market with new mock data. 每次竞拍后都会刷新新的货柜，你可以自由选择更稳妥或更高价值的线索。</p>
+                <h2>Daily Auction / 今日竞拍</h2>
+                <p>Pick one lot or skip entirely. After the auction you can sell any warehouse items individually, then claim at most one extra reward before ending the day. 每天只能买一只柜子，或者选择不买；卖货阶段可以逐件卖，卖完再挑一条额外奖励。</p>
+
+                <div class="section-block">
+                    <div class="section-head">
+                        <h3 style="margin: 0;">Phase / 当前阶段</h3>
+                        <span class="phase-badge" id="phaseBadge">Auction / 竞拍</span>
+                    </div>
+                    <p id="phaseSummary">Choose one container or skip the auction. 先从今天的几只柜子里选一只，或者直接跳过。</p>
+                    <div class="effect-list" id="effectList"></div>
+                    <div class="message" id="messageBox"></div>
+                </div>
+
                 <div class="action-row" style="margin-top: 18px;">
-                    <button class="reroll-button" id="rerollButton">Refresh Lots / 刷新本轮拍卖</button>
-                    <span class="small">Free reroll, mock data only / 不扣钱，只会换一批随机 mock 数据。</span>
+                    <button class="skip-button" id="skipAuctionButton">Skip Buying / 今天不买</button>
                 </div>
+
                 <div class="lot-grid" id="lotGrid"></div>
-                <div class="message" id="messageBox"></div>
-                <div class="result-panel" id="resultPanel" hidden>
-                    <div class="result-row">
-                        <h3 id="resultTitle" style="margin: 0;"></h3>
-                        <span class="lot-tag" id="resultTag"></span>
+
+                <section class="section-block" id="rewardSection" hidden>
+                    <div class="section-head">
+                        <h3 style="margin: 0;">Extra Reward / 额外奖励</h3>
+                        <span class="reward-tag">Choose at most one / 最多选一条</span>
                     </div>
-                    <p id="resultSummary" style="margin: 8px 0 14px;"></p>
-                    <div class="item-list" id="itemList"></div>
-                    <div class="result-row" style="margin-top: 14px;">
-                        <strong>Settlement / 本次结算：</strong>
-                        <span id="resultFinance"></span>
+                    <p>These bonuses can be free or cost cash. Rewards affect your next day unless noted otherwise. 奖励有的免费有的要花钱，通常会影响下一天。</p>
+                    <div class="reward-grid" id="rewardGrid"></div>
+                    <div class="action-row" style="margin-top: 14px;">
+                        <button class="skip-button" id="skipRewardButton">Skip Reward / 放弃奖励</button>
                     </div>
-                    <button class="next-button" id="nextRoundButton" style="margin-top: 16px;">Next Round / 继续买下一个集装箱</button>
+                </section>
+
+                <div class="warehouse-actions">
+                    <button class="phase-button" id="finishSalesButton">Finish Selling / 结束今天卖货</button>
+                    <button class="next-button" id="nextRoundButton">Next Day / 进入下一天</button>
                 </div>
+                <p class="footer-note">Lose condition: when the next day starts, storage and license are deducted automatically; if the license leaves you broke, the run ends. 胜利条件是现金先冲到 ¥10,000；进入下一天会自动扣仓储和牌照费，扣完牌照后没钱就直接失败。</p>
             </section>
 
             <aside class="panel">
-                <h2>History / 经营记录</h2>
-                <p>Every opened container is sold immediately for cash flow. 每次开箱都会自动把货物快速出售，利润会直接回到现金池。</p>
-                <div class="history-list" id="historyList" style="margin-top: 18px;"></div>
+                <h2>Warehouse & Log / 仓库与经营记录</h2>
+                <p>Opened goods go into your own warehouse. Sell item by item when today's offer looks good, or hold them and pay cheap storage for a later spike. 开出来的货物都会进自己的仓库；你可以今天逐件卖，也可以付比较便宜的仓储费等以后更好的价格。</p>
+                <div class="warehouse-list" id="warehouseList" style="margin-top: 18px;"></div>
+                <div class="small" id="warehouseSummary" style="margin-top: 14px;"></div>
+
+                <h3 style="margin-top: 26px;">History / 经营记录</h3>
+                <div class="history-list" id="historyList"></div>
             </aside>
         </section>
     </main>
 
     <script>
-        const STARTING_CASH = 1800;
-        const MIN_BID_PRICE = 120;
-        const MIN_RESERVE_RATIO = 0.52;
-        const RESERVE_RATIO_VARIANCE = 0.16;
-        const MIN_PROFIT_MARGIN = 40;
-        const AFFORDABLE_BID_RATIO = 0.72;
-        const MAX_HISTORY_ENTRIES = 6;
+        const STARTING_CASH = 2200;
+        const WIN_CASH = 10000;
+        const MIN_BID_PRICE = 180;
+        const CONTAINER_GROWTH = 1.055;
+        const MARKET_GROWTH = 1.075;
+        const MIN_MARKET_MULTIPLIER = 0.48;
+        const MAX_MARKET_MULTIPLIER = 2.15;
+        const MAX_HISTORY_ENTRIES = 10;
+        const BASE_LICENSE_FEE = 230;
+        const LICENSE_GROWTH = 1.18;
+        const LICENSE_STEP = 30;
+
         const state = {
             cash: STARTING_CASH,
             round: 1,
             opened: 0,
             lots: [],
+            inventory: [],
+            rewardOptions: [],
             history: [],
+            phase: "auction",
+            nextLotDiscount: 0,
+            nextStorageFree: false,
+            nextMarketBoost: 0,
+            nextLicenseDiscount: 0,
+            nextLuckyLot: false,
+            marketBoostToday: 0,
+            marketTable: {},
+            chosenLotName: "",
+            gameOver: false,
+            victory: false,
+            itemId: 1,
         };
 
         const containerTemplates = [
@@ -382,97 +503,201 @@
                 nameEn: "Port Repair Locker",
                 risk: "稳健",
                 riskLabel: "Steady",
-                hints: ["可见工具箱边角", "货单写着维修耗材", "重量偏重，适合稳妥回本"],
+                clue: "Same-day flips are safer, but upside is smaller. / 更适合当天保守出货。",
+                priceBias: 0.91,
                 items: [
-                    { name: "工业电钻", min: 180, max: 260 },
-                    { name: "扭力扳手组", min: 120, max: 180 },
-                    { name: "备用铜线卷", min: 80, max: 130 },
-                    { name: "工地照明灯", min: 60, max: 120 },
+                    { name: "工业电钻", min: 180, max: 280, storage: 8, swing: 0.18 },
+                    { name: "扭力扳手组", min: 110, max: 170, storage: 5, swing: 0.12 },
+                    { name: "备用铜线卷", min: 70, max: 125, storage: 4, swing: 0.15 },
+                    { name: "工地照明灯", min: 50, max: 110, storage: 5, swing: 0.16 },
                 ],
+                hints: ["可见工具箱边角", "货单写着维修耗材", "重量偏重，适合稳妥回本"],
             },
             {
                 nameZh: "直播退货柜",
                 nameEn: "Livestream Return Crate",
                 risk: "热门",
                 riskLabel: "Hot",
-                hints: ["纸箱标签混杂", "贴有退货仓封条", "可能开出小家电与潮玩"],
+                clue: "Sensitive to daily demand. Great on a hot day, rough on a cold day. / 吃当天行情。",
+                priceBias: 0.95,
                 items: [
-                    { name: "便携投影仪", min: 200, max: 340 },
-                    { name: "蓝牙音箱", min: 120, max: 180 },
-                    { name: "潮玩盲盒整箱", min: 150, max: 260 },
-                    { name: "直播补光灯", min: 70, max: 130 },
+                    { name: "便携投影仪", min: 220, max: 390, storage: 11, swing: 0.28 },
+                    { name: "蓝牙音箱", min: 110, max: 190, storage: 6, swing: 0.24 },
+                    { name: "潮玩盲盒整箱", min: 130, max: 280, storage: 5, swing: 0.34 },
+                    { name: "直播补光灯", min: 60, max: 130, storage: 4, swing: 0.2 },
                 ],
+                hints: ["纸箱标签混杂", "贴有退货仓封条", "可能开出小家电与潮玩"],
             },
             {
                 nameZh: "咖啡店清仓柜",
                 nameEn: "Cafe Clearance Box",
                 risk: "稳健",
                 riskLabel: "Steady",
-                hints: ["外箱印着咖啡豆产地", "有少量金属器具碰撞声", "适合喜欢稳定利润的玩家"],
+                clue: "Not explosive, but usually manageable if cash is low. / 低资金时更容易稳住。",
+                priceBias: 0.92,
                 items: [
-                    { name: "半自动咖啡机", min: 220, max: 320 },
-                    { name: "手冲礼盒", min: 90, max: 150 },
-                    { name: "磨豆机", min: 140, max: 210 },
-                    { name: "咖啡杯套装", min: 50, max: 110 },
+                    { name: "半自动咖啡机", min: 200, max: 320, storage: 10, swing: 0.2 },
+                    { name: "手冲礼盒", min: 80, max: 150, storage: 4, swing: 0.16 },
+                    { name: "磨豆机", min: 120, max: 220, storage: 6, swing: 0.18 },
+                    { name: "咖啡杯套装", min: 45, max: 100, storage: 3, swing: 0.12 },
                 ],
+                hints: ["外箱印着咖啡豆产地", "有少量金属器具碰撞声", "适合喜欢稳定利润的玩家"],
             },
             {
                 nameZh: "校园社团仓储柜",
                 nameEn: "Campus Club Storage",
                 risk: "惊喜",
                 riskLabel: "Lucky",
-                hints: ["箱体有活动海报残胶", "听起来不太重", "运气好会翻出电子设备"],
+                clue: "Often underpriced. If the market lines up, it can carry a run. / 低价高波动，容易爽赢。",
+                priceBias: 0.68,
                 items: [
-                    { name: "二手平板", min: 180, max: 280 },
-                    { name: "拍立得相机", min: 160, max: 250 },
-                    { name: "便携音响", min: 90, max: 140 },
-                    { name: "印刷物料包", min: 40, max: 80 },
+                    { name: "二手平板", min: 160, max: 320, storage: 9, swing: 0.3 },
+                    { name: "拍立得相机", min: 120, max: 260, storage: 7, swing: 0.28 },
+                    { name: "便携音响", min: 80, max: 150, storage: 4, swing: 0.2 },
+                    { name: "印刷物料包", min: 35, max: 75, storage: 2, swing: 0.1 },
                 ],
+                hints: ["箱体有活动海报残胶", "听起来不太重", "运气好会翻出电子设备"],
             },
             {
                 nameZh: "民宿改造尾货柜",
                 nameEn: "Guesthouse Remodel Overstock",
                 risk: "大件",
                 riskLabel: "Bulky",
-                hints: ["清单里写着装饰与布草", "打开门有木头和棉织品味道", "转卖空间大但出价偏高"],
+                clue: "Storage is a little heavier, but patient selling can pay off. / 更适合屯一两天。",
+                priceBias: 0.75,
                 items: [
-                    { name: "设计感吊灯", min: 220, max: 340 },
-                    { name: "床品四件套", min: 110, max: 170 },
-                    { name: "装饰画组合", min: 120, max: 180 },
-                    { name: "复古边桌", min: 150, max: 230 },
+                    { name: "设计感吊灯", min: 210, max: 360, storage: 12, swing: 0.22 },
+                    { name: "床品四件套", min: 95, max: 170, storage: 5, swing: 0.14 },
+                    { name: "装饰画组合", min: 110, max: 200, storage: 6, swing: 0.18 },
+                    { name: "复古边桌", min: 140, max: 240, storage: 9, swing: 0.2 },
                 ],
+                hints: ["清单里写着装饰与布草", "打开门有木头和棉织品味道", "转卖空间大但出价偏高"],
+            },
+            {
+                nameZh: "机房淘汰柜",
+                nameEn: "Server Salvage Rack",
+                risk: "投机",
+                riskLabel: "Spec",
+                clue: "The best days are absurdly good, the bad days hurt hard. / 需要一点运气和胆量。",
+                priceBias: 0.7,
+                items: [
+                    { name: "服务器主板", min: 240, max: 470, storage: 13, swing: 0.34 },
+                    { name: "机柜导轨套件", min: 90, max: 170, storage: 6, swing: 0.2 },
+                    { name: "品牌散热器", min: 80, max: 180, storage: 5, swing: 0.24 },
+                    { name: "高速网卡", min: 100, max: 250, storage: 7, swing: 0.3 },
+                ],
+                hints: ["贴纸写着下线资产", "重量和价值都不太好判断", "行情好的时候会很夸张"],
             },
         ];
 
+        const rewardPool = [
+            {
+                id: "discount",
+                nameEn: "Dockside Bargain",
+                nameZh: "码头讲价券",
+                cost: 0,
+                description: "Next day's container bids are 15% cheaper. / 下一天竞拍价 -15%。",
+                apply() {
+                    state.nextLotDiscount = Math.max(state.nextLotDiscount, 0.15);
+                },
+            },
+            {
+                id: "storage",
+                nameEn: "Free Storage Sheet",
+                nameZh: "免仓储清单",
+                cost: 80,
+                description: "Next overnight storage fees are fully waived. / 下一次过夜仓储费全免。",
+                apply() {
+                    state.nextStorageFree = true;
+                },
+            },
+            {
+                id: "market",
+                nameEn: "Private Buyer List",
+                nameZh: "大买家名单",
+                cost: 120,
+                description: "Tomorrow all sell prices get +55%. / 下一天所有卖价 +55%。",
+                apply() {
+                    state.nextMarketBoost = Math.max(state.nextMarketBoost, 0.55);
+                },
+            },
+            {
+                id: "license",
+                nameEn: "License Relief",
+                nameZh: "牌照补贴",
+                cost: 90,
+                description: "Next license fee is reduced by 18%. / 下一次牌照费 -18%。",
+                apply() {
+                    state.nextLicenseDiscount = Math.max(state.nextLicenseDiscount, 0.18);
+                },
+            },
+            {
+                id: "cash",
+                nameEn: "Quick Cashback",
+                nameZh: "速返现金",
+                cost: 0,
+                value: 360,
+                description: "Gain ¥360 immediately. / 立刻获得 ¥360。",
+                apply() {
+                    state.cash += this.value;
+                },
+            },
+            {
+                id: "appraisal",
+                nameEn: "Valuation Note",
+                nameZh: "估价快线",
+                cost: 110,
+                description: "Tomorrow one extra Lucky lot appears in the auction. / 下一天拍卖多刷一只惊喜柜。",
+                apply() {
+                    state.nextLuckyLot = true;
+                },
+            },
+        ];
+
+        const itemCatalog = Object.fromEntries(
+            containerTemplates
+                .flatMap((template) => template.items)
+                .map((item) => [item.name, item]),
+        );
+
         const cashValue = document.getElementById("cashValue");
-        const profitValue = document.getElementById("profitValue");
+        const netWorthValue = document.getElementById("netWorthValue");
+        const inventoryValue = document.getElementById("inventoryValue");
         const openedValue = document.getElementById("openedValue");
         const roundValue = document.getElementById("roundValue");
+        const licenseValue = document.getElementById("licenseValue");
+        const phaseBadge = document.getElementById("phaseBadge");
+        const phaseSummary = document.getElementById("phaseSummary");
+        const effectList = document.getElementById("effectList");
         const lotGrid = document.getElementById("lotGrid");
+        const rewardGrid = document.getElementById("rewardGrid");
+        const rewardSection = document.getElementById("rewardSection");
+        const warehouseList = document.getElementById("warehouseList");
+        const warehouseSummary = document.getElementById("warehouseSummary");
         const historyList = document.getElementById("historyList");
         const messageBox = document.getElementById("messageBox");
-        const resultPanel = document.getElementById("resultPanel");
-        const resultTitle = document.getElementById("resultTitle");
-        const resultTag = document.getElementById("resultTag");
-        const resultSummary = document.getElementById("resultSummary");
-        const itemList = document.getElementById("itemList");
-        const resultFinance = document.getElementById("resultFinance");
+        const skipAuctionButton = document.getElementById("skipAuctionButton");
+        const finishSalesButton = document.getElementById("finishSalesButton");
+        const skipRewardButton = document.getElementById("skipRewardButton");
         const nextRoundButton = document.getElementById("nextRoundButton");
-        const rerollButton = document.getElementById("rerollButton");
 
         function formatMoney(value) {
-            return `¥${value.toLocaleString("zh-CN")}`;
+            return `¥${Math.round(value).toLocaleString("zh-CN")}`;
         }
 
         function randomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function pickTemplate() {
-            return containerTemplates[randomInt(0, containerTemplates.length - 1)];
+        function randomFloatBetween(min, max) {
+            return Math.random() * (max - min) + min;
         }
 
-        function shuffleItems(items) {
+        function clamp(value, min, max) {
+            return Math.min(max, Math.max(min, value));
+        }
+
+        function shuffle(items) {
             const shuffled = [...items];
 
             for (let currentIndex = shuffled.length - 1; currentIndex > 0; currentIndex -= 1) {
@@ -483,39 +708,177 @@
             return shuffled;
         }
 
-        function buildLot() {
-            const template = pickTemplate();
+        function addHistory(title, detail, amount = null) {
+            state.history.unshift({ title, detail, amount });
+            state.history = state.history.slice(0, MAX_HISTORY_ENTRIES);
+        }
+
+        function licenseFeeForRound(round) {
+            if (round <= 1) {
+                return 0;
+            }
+
+            const elapsedRounds = round - 2;
+            return Math.round(BASE_LICENSE_FEE * Math.pow(LICENSE_GROWTH, elapsedRounds) + elapsedRounds * LICENSE_STEP);
+        }
+
+        function appraisedGrowth(round) {
+            return Math.pow(CONTAINER_GROWTH, round - 1);
+        }
+
+        function marketGrowth(round) {
+            return Math.pow(MARKET_GROWTH, round - 1);
+        }
+
+        function pickTemplate(predicate = null) {
+            const pool = predicate ? containerTemplates.filter(predicate) : containerTemplates;
+            const options = pool.length > 0 ? pool : containerTemplates;
+            return options[randomInt(0, options.length - 1)];
+        }
+
+        function buildLot(predicate = null) {
+            const template = pickTemplate(predicate);
             const itemCount = randomInt(2, 4);
-            const shuffled = shuffleItems(template.items).slice(0, itemCount);
-            const items = shuffled.map((item) => ({
+            const chosenItems = shuffle(template.items).slice(0, itemCount);
+            const items = chosenItems.map((item) => ({
+                id: ++state.itemId,
                 name: item.name,
-                value: randomInt(item.min, item.max),
+                appraisal: Math.round(randomInt(item.min, item.max) * appraisedGrowth(state.round)),
+                storageFee: item.storage,
+                swing: item.swing,
+                acquiredRound: state.round,
+                currentPrice: 0,
             }));
-            const resaleValue = items.reduce((sum, item) => sum + item.value, 0);
-            const reservePrice = Math.max(
-                MIN_BID_PRICE,
-                Math.floor(resaleValue * (MIN_RESERVE_RATIO + Math.random() * RESERVE_RATIO_VARIANCE)),
-            );
+            const appraisalTotal = items.reduce((sum, item) => sum + item.appraisal, 0);
+            const priceRatio = template.priceBias + randomFloatBetween(-0.08, 0.18) + (state.round - 1) * 0.006;
+            const discountMultiplier = 1 - state.nextLotDiscount;
 
             return {
                 nameZh: template.nameZh,
                 nameEn: template.nameEn,
                 risk: template.risk,
                 riskLabel: template.riskLabel,
+                clue: template.clue,
                 hints: template.hints,
                 items,
-                resaleValue,
-                bid: Math.max(MIN_BID_PRICE, Math.min(reservePrice, resaleValue - MIN_PROFIT_MARGIN)),
+                appraisalTotal,
+                storageTotal: items.reduce((sum, item) => sum + item.storageFee, 0),
+                bid: Math.max(MIN_BID_PRICE, Math.round(appraisalTotal * priceRatio * discountMultiplier)),
             };
         }
 
-        function generateLots() {
-            state.lots = Array.from({ length: 3 }, buildLot);
+        function generateRewardOptions() {
+            state.rewardOptions = shuffle(rewardPool).slice(0, 3);
+        }
 
-            if (state.lots.every((lot) => lot.bid > state.cash)) {
-                state.lots.sort((left, right) => left.bid - right.bid);
-                state.lots[0].bid = Math.max(MIN_BID_PRICE, Math.floor(state.cash * AFFORDABLE_BID_RATIO));
+        function buildMarketTable() {
+            state.marketTable = {};
+
+            Object.values(itemCatalog).forEach((item) => {
+                const multiplier = clamp(
+                    marketGrowth(state.round) * (1 + randomFloatBetween(-item.swing, item.swing) + state.marketBoostToday),
+                    MIN_MARKET_MULTIPLIER,
+                    MAX_MARKET_MULTIPLIER,
+                );
+
+                state.marketTable[item.name] = multiplier;
+            });
+
+            state.marketBoostToday = 0;
+        }
+
+        function refreshInventoryPrices() {
+            state.inventory.forEach((item) => {
+                const multiplier = state.marketTable[item.name] || 1;
+                item.currentPrice = Math.max(25, Math.round(item.appraisal * multiplier));
+            });
+        }
+
+        function generateLots() {
+            state.lots = Array.from({ length: 3 }, () => buildLot());
+
+            if (state.nextLuckyLot) {
+                state.lots[2] = buildLot((template) => template.riskLabel === "Lucky");
+                state.nextLuckyLot = false;
             }
+
+            if (state.cash >= MIN_BID_PRICE && state.lots.every((lot) => lot.bid > state.cash)) {
+                state.lots.sort((left, right) => left.bid - right.bid);
+                state.lots[0].bid = Math.max(MIN_BID_PRICE, Math.floor(state.cash * 0.82));
+            }
+        }
+
+        function calculateStorageFee() {
+            return state.inventory.reduce((sum, item) => sum + item.storageFee, 0);
+        }
+
+        function calculateNetWorth() {
+            return state.cash + state.inventory.reduce((sum, item) => sum + item.currentPrice, 0);
+        }
+
+        function describeMarket(item) {
+            const ratio = item.currentPrice / item.appraisal;
+
+            if (ratio >= 1.25) {
+                return { label: "Hot / 热卖", tone: "good" };
+            }
+
+            if (ratio >= 1.08) {
+                return { label: "Firm / 顺价", tone: "good" };
+            }
+
+            if (ratio <= 0.85) {
+                return { label: "Cold / 冷门", tone: "warn" };
+            }
+
+            return { label: "Flat / 平盘", tone: "neutral" };
+        }
+
+        function getPhaseMeta() {
+            if (state.victory) {
+                return {
+                    badge: "Victory / 胜利",
+                    summary: `You reached ${formatMoney(WIN_CASH)}. Cash is king, the port boss is impressed. 你已经攒到 ${formatMoney(WIN_CASH)}，本局胜利。`,
+                };
+            }
+
+            if (state.gameOver) {
+                return {
+                    badge: "Defeat / 失败",
+                    summary: "You ran out of money after the daily deductions. 过夜扣完费用后资金断裂，本局结束。",
+                };
+            }
+
+            if (state.phase === "auction") {
+                return {
+                    badge: "Auction / 竞拍",
+                    summary: "Choose exactly one lot or skip the auction. 先从今天的几只柜子里选一只，或者跳过。",
+                };
+            }
+
+            if (state.phase === "sales") {
+                return {
+                    badge: "Sales / 卖货",
+                    summary: "Sell warehouse items one by one, or hold them for tomorrow and pay storage. 现在可以逐件卖，也可以留到明天继续囤。",
+                };
+            }
+
+            if (state.phase === "reward") {
+                return {
+                    badge: "Reward / 奖励",
+                    summary: "Pick at most one reward, or skip it and lock in the day. 现在最多选一条奖励，也可以直接放弃。",
+                };
+            }
+
+            return {
+                badge: "Next Day / 下一天",
+                summary: `Click next day to deduct ${formatMoney(calculateStorageFee())} storage and ${formatMoney(getDiscountedLicenseFee())} license. 点击进入下一天后会先扣仓储和牌照费。`,
+            };
+        }
+
+        function getDiscountedLicenseFee() {
+            const nextBaseFee = licenseFeeForRound(state.round + 1);
+            return Math.round(nextBaseFee * (1 - state.nextLicenseDiscount));
         }
 
         function setMessage(text, tone = "") {
@@ -525,9 +888,51 @@
 
         function renderStats() {
             cashValue.textContent = formatMoney(state.cash);
-            profitValue.textContent = formatMoney(state.cash - STARTING_CASH);
+            netWorthValue.textContent = formatMoney(calculateNetWorth());
+            inventoryValue.textContent = state.inventory.length;
             openedValue.textContent = state.opened;
             roundValue.textContent = state.round;
+            licenseValue.textContent = formatMoney(getDiscountedLicenseFee());
+        }
+
+        function renderEffects() {
+            effectList.innerHTML = "";
+            const pending = [];
+
+            if (state.nextLotDiscount > 0) {
+                pending.push(
+                    state.phase === "auction"
+                        ? `Today's bids already discounted by ${Math.round(state.nextLotDiscount * 100)}% / 今日竞拍价已打折`
+                        : `Next day bids -${Math.round(state.nextLotDiscount * 100)}% / 下一天竞拍价下降`,
+                );
+            }
+
+            if (state.nextStorageFree) {
+                pending.push("Next overnight storage free / 下一次过夜仓储全免");
+            }
+
+            if (state.nextMarketBoost > 0) {
+                pending.push(`Tomorrow sell prices +${Math.round(state.nextMarketBoost * 100)}% / 明天卖价提高`);
+            }
+
+            if (state.nextLicenseDiscount > 0) {
+                pending.push(`Next license -${Math.round(state.nextLicenseDiscount * 100)}% / 下一次牌照减免`);
+            }
+
+            if (pending.length === 0) {
+                const chip = document.createElement("div");
+                chip.className = "item-chip small";
+                chip.textContent = "No pending bonuses / 当前没有待生效奖励";
+                effectList.appendChild(chip);
+                return;
+            }
+
+            pending.forEach((text) => {
+                const chip = document.createElement("div");
+                chip.className = "item-chip small";
+                chip.textContent = text;
+                effectList.appendChild(chip);
+            });
         }
 
         function renderLots() {
@@ -541,23 +946,98 @@
                         <div>
                             <span class="lot-tag">${lot.riskLabel} / ${lot.risk}</span>
                             <h3 class="lot-name">${lot.nameEn}</h3>
-                            <div class="small lot-subtitle">${lot.nameZh}</div>
+                            <div class="small">${lot.nameZh}</div>
                         </div>
                         <strong class="lot-price">${formatMoney(lot.bid)}</strong>
                     </div>
+                    <div class="small">${lot.clue}</div>
                     <ul class="hint-list">
                         ${lot.hints.map((hint) => `<li>${hint}</li>`).join("")}
                     </ul>
+                    <div class="meta-grid">
+                        <div class="meta-box small">Items / 货物数：${lot.items.length}</div>
+                        <div class="meta-box small">Storage / 仓储预估：${formatMoney(lot.storageTotal)}</div>
+                    </div>
                 `;
 
                 const button = document.createElement("button");
                 button.className = "bid-button";
-                button.textContent = state.cash >= lot.bid ? `Bid Now / 竞标这个柜子` : `Need More Cash / 现金不足`;
-                button.disabled = state.cash < lot.bid;
+                button.textContent = state.cash >= lot.bid ? "Buy This Lot / 买下这只柜子" : "Need More Cash / 现金不足";
+                button.disabled = state.phase !== "auction" || state.cash < lot.bid || state.gameOver || state.victory;
                 button.addEventListener("click", () => buyLot(index));
                 card.appendChild(button);
                 lotGrid.appendChild(card);
             });
+        }
+
+        function renderRewardOptions() {
+            rewardGrid.innerHTML = "";
+            rewardSection.hidden = state.phase !== "reward";
+
+            state.rewardOptions.forEach((reward) => {
+                const card = document.createElement("article");
+                card.className = "reward-card";
+                card.innerHTML = `
+                    <div class="reward-top">
+                        <div>
+                            <span class="reward-tag">${reward.nameEn}</span>
+                            <h3 style="margin: 10px 0 0;">${reward.nameZh}</h3>
+                        </div>
+                        <strong>${reward.cost > 0 ? formatMoney(reward.cost) : "Free / 免费"}</strong>
+                    </div>
+                    <div class="small">${reward.description}</div>
+                `;
+
+                const button = document.createElement("button");
+                button.className = "reward-button";
+                button.textContent = reward.cost <= state.cash ? "Claim Reward / 选择这条" : "Need More Cash / 现金不足";
+                button.disabled = state.phase !== "reward" || reward.cost > state.cash || state.gameOver || state.victory;
+                button.addEventListener("click", () => chooseReward(reward.id));
+                card.appendChild(button);
+                rewardGrid.appendChild(card);
+            });
+        }
+
+        function renderWarehouse() {
+            warehouseList.innerHTML = "";
+
+            if (state.inventory.length === 0) {
+                const empty = document.createElement("div");
+                empty.className = "history-item";
+                empty.innerHTML = "<strong>Warehouse empty / 仓库空空</strong><div class='small' style='margin-top: 6px;'>Buy a lot to stock up, or skip today and preserve cash. 先买柜子进货，或者干脆跳过一天保住资金。</div>";
+                warehouseList.appendChild(empty);
+            } else {
+                state.inventory.forEach((item) => {
+                    const market = describeMarket(item);
+                    const element = document.createElement("article");
+                    element.className = "warehouse-item";
+                    element.innerHTML = `
+                        <div class="warehouse-top">
+                            <div>
+                                <span class="market-tag ${market.tone}">${market.label}</span>
+                                <h3 class="warehouse-name">${item.name}</h3>
+                                <div class="small">Day ${item.acquiredRound} item / 第 ${item.acquiredRound} 天入库</div>
+                            </div>
+                            <strong class="warehouse-price">${formatMoney(item.currentPrice)}</strong>
+                        </div>
+                        <div class="meta-grid">
+                            <div class="meta-box small">Appraisal / 估价：${formatMoney(item.appraisal)}</div>
+                            <div class="meta-box small">Storage / 过夜仓储：${formatMoney(item.storageFee)}</div>
+                        </div>
+                    `;
+
+                    const sellButton = document.createElement("button");
+                    sellButton.className = "sell-button";
+                    sellButton.textContent = "Sell Today / 今天卖掉";
+                    sellButton.disabled = state.phase !== "sales" || state.gameOver || state.victory;
+                    sellButton.addEventListener("click", () => sellItem(item.id));
+                    element.appendChild(sellButton);
+                    warehouseList.appendChild(element);
+                });
+            }
+
+            const storageFee = calculateStorageFee();
+            warehouseSummary.textContent = `Today's warehouse offer total: ${formatMoney(state.inventory.reduce((sum, item) => sum + item.currentPrice, 0))} · overnight storage: ${formatMoney(storageFee)} / 今日仓库总卖价 ${formatMoney(state.inventory.reduce((sum, item) => sum + item.currentPrice, 0))}，过夜仓储 ${formatMoney(storageFee)}`;
         }
 
         function renderHistory() {
@@ -566,7 +1046,7 @@
             if (state.history.length === 0) {
                 const empty = document.createElement("div");
                 empty.className = "history-item";
-                empty.innerHTML = "<strong>No containers opened yet / 还没开箱</strong><div class='small' style='margin-top: 6px;'>Buy your first lot and the log will appear here. 先买下第一个随机集装箱，记录会显示在这里。</div>";
+                empty.innerHTML = "<strong>No actions yet / 还没有操作记录</strong><div class='small' style='margin-top: 6px;'>The log tracks purchases, sales, rewards, and daily fees. 这里会记录买箱、卖货、奖励和每天扣的费用。</div>";
                 historyList.appendChild(empty);
                 return;
             }
@@ -574,88 +1054,213 @@
             state.history.forEach((entry) => {
                 const element = document.createElement("article");
                 element.className = "history-item";
+                const amountClass = entry.amount === null ? "" : entry.amount >= 0 ? "profit positive" : "profit negative";
+                const amountText = entry.amount === null ? "" : `${entry.amount >= 0 ? "+" : "-"}${formatMoney(Math.abs(entry.amount))}`;
                 element.innerHTML = `
                     <div class="history-head">
                         <div>
-                            <strong>${entry.nameEn}</strong>
-                            <div class="small">${entry.nameZh}</div>
+                            <strong>${entry.title}</strong>
+                            <div class="small">${entry.detail}</div>
                         </div>
-                        <span class="profit ${entry.profit >= 0 ? "positive" : ""}">${entry.profit >= 0 ? "+" : ""}${formatMoney(entry.profit)}</span>
+                        <span class="${amountClass}">${amountText}</span>
                     </div>
-                    <div class="small">Bid ${formatMoney(entry.bid)} · Sale ${formatMoney(entry.sale)} / 成交价 ${formatMoney(entry.bid)} · 卖货收入 ${formatMoney(entry.sale)}</div>
                 `;
                 historyList.appendChild(element);
             });
         }
 
-        function showResult(lot, sale, profit) {
-            resultTitle.textContent = `${lot.nameEn} / ${lot.nameZh}`;
-            resultTag.textContent = `${lot.riskLabel} · Cleared`;
-            resultSummary.textContent = `You bought this lot for ${formatMoney(lot.bid)} and sold every item immediately. 你以 ${formatMoney(lot.bid)} 拍下该集装箱，并把里面的货物全部出手。`;
-            itemList.innerHTML = lot.items
-                .map((item) => `<div class="item-chip"><span>${item.name}</span><strong>${formatMoney(item.value)}</strong></div>`)
-                .join("");
-            resultFinance.innerHTML = `Sale total <strong>${formatMoney(sale)}</strong>, profit <span class="profit positive">+${formatMoney(profit)}</span> / 卖出总额 <strong>${formatMoney(sale)}</strong>，本次利润 <span class="profit positive">+${formatMoney(profit)}</span>`;
-            resultPanel.hidden = false;
+        function renderPhase() {
+            const meta = getPhaseMeta();
+            phaseBadge.textContent = meta.badge;
+            phaseSummary.textContent = meta.summary;
+            skipAuctionButton.disabled = state.phase !== "auction" || state.gameOver || state.victory;
+            finishSalesButton.disabled = state.phase !== "sales" || state.gameOver || state.victory;
+            skipRewardButton.disabled = state.phase !== "reward" || state.gameOver || state.victory;
+            nextRoundButton.disabled = state.phase !== "next" || state.gameOver || state.victory;
         }
 
-        function hideResult() {
-            resultPanel.hidden = true;
+        function render() {
+            renderStats();
+            renderEffects();
+            renderPhase();
+            renderLots();
+            renderRewardOptions();
+            renderWarehouse();
+            renderHistory();
+        }
+
+        function startDay() {
+            state.phase = "auction";
+            state.chosenLotName = "";
+            state.marketBoostToday = state.nextMarketBoost;
+            state.nextMarketBoost = 0;
+            buildMarketTable();
+            refreshInventoryPrices();
+            generateLots();
+            generateRewardOptions();
+            render();
+        }
+
+        function checkForVictory() {
+            if (state.cash >= WIN_CASH) {
+                state.victory = true;
+                state.phase = "done";
+                setMessage(`You hit ${formatMoney(state.cash)} and won the run. 你已经攒到 ${formatMoney(state.cash)}，成功通关。`, "good");
+                render();
+                return true;
+            }
+
+            return false;
         }
 
         function buyLot(index) {
+            if (state.phase !== "auction" || state.gameOver || state.victory) {
+                return;
+            }
+
             const lot = state.lots[index];
 
-            if (lot.bid > state.cash) {
-                setMessage("You do not have enough cash for this lot. 这批货柜的叫价超过了你的现金，先刷新或攒更多利润。", "warn");
+            if (!lot || lot.bid > state.cash) {
+                setMessage("You cannot afford this lot. 这只柜子现在买不起。", "warn");
                 return;
             }
 
             state.cash -= lot.bid;
-            const sale = lot.resaleValue;
-            const profit = sale - lot.bid;
-            state.cash += sale;
             state.opened += 1;
-
-            state.history.unshift({
-                nameZh: lot.nameZh,
-                nameEn: lot.nameEn,
-                bid: lot.bid,
-                sale,
-                profit,
-            });
-            state.history = state.history.slice(0, MAX_HISTORY_ENTRIES);
-
-            renderStats();
-            renderHistory();
-            showResult(lot, sale, profit);
-            setMessage(`Bought "${lot.nameEn}" and cleared a profit of ${formatMoney(profit)}. 你成功拍下「${lot.nameZh}」，清仓后赚到了 ${formatMoney(profit)}。`, "good");
-            lotGrid.innerHTML = "";
+            state.inventory.push(...lot.items);
+            refreshInventoryPrices();
+            state.phase = "sales";
+            state.chosenLotName = lot.nameEn;
+            state.nextLotDiscount = 0;
+            addHistory(`Day ${state.round} bought ${lot.nameEn}`, `${lot.nameZh} · ${lot.items.length} items entered the warehouse / ${lot.items.length} 件货物入库`, -lot.bid);
+            setMessage(`Opened "${lot.nameEn}". The goods are now in your warehouse, ready to sell or hold. 你拍下了「${lot.nameZh}」，货物已经入库，可以今天卖，也可以囤着。`, "good");
+            render();
+            checkForVictory();
         }
 
-        function startNextRound() {
-            state.round += 1;
-            generateLots();
-            renderStats();
-            renderLots();
-            hideResult();
-            setMessage("A fresh wave of lots has arrived. 新一批随机集装箱已经到港，继续用利润滚动出价吧。");
+        function skipAuction() {
+            if (state.phase !== "auction" || state.gameOver || state.victory) {
+                return;
+            }
+
+            state.phase = "sales";
+            state.nextLotDiscount = 0;
+            addHistory(`Day ${state.round} skipped the auction`, "No container bought today / 今天没有买柜子");
+            setMessage("You skipped buying today. Sell what you already have, or go straight to rewards. 你今天没有买柜子，可以处理仓库库存后再去拿奖励。", "info");
+            render();
         }
 
-        rerollButton.addEventListener("click", () => {
-            generateLots();
-            renderLots();
-            hideResult();
-            setMessage("Lots refreshed with new clues. 已刷新本轮拍卖，新的随机线索已出现。");
-        });
+        function sellItem(itemId) {
+            if (state.phase !== "sales" || state.gameOver || state.victory) {
+                return;
+            }
 
-        nextRoundButton.addEventListener("click", startNextRound);
+            const itemIndex = state.inventory.findIndex((item) => item.id === itemId);
 
-        generateLots();
-        renderStats();
-        renderLots();
-        renderHistory();
-        setMessage("You have seed money ready to deploy. 你有一笔启动资金，先挑一个看起来最值钱的集装箱试试手气。");
+            if (itemIndex === -1) {
+                return;
+            }
+
+            const item = state.inventory[itemIndex];
+            state.cash += item.currentPrice;
+            state.inventory.splice(itemIndex, 1);
+            addHistory(`Day ${state.round} sold ${item.name}`, `Sold for ${formatMoney(item.currentPrice)} / 以 ${formatMoney(item.currentPrice)} 卖出`, item.currentPrice);
+            setMessage(`Sold ${item.name} for ${formatMoney(item.currentPrice)}. 你以 ${formatMoney(item.currentPrice)} 卖出了 ${item.name}。`, item.currentPrice >= item.appraisal ? "good" : "info");
+            refreshInventoryPrices();
+            render();
+            checkForVictory();
+        }
+
+        function finishSales() {
+            if (state.phase !== "sales" || state.gameOver || state.victory) {
+                return;
+            }
+
+            state.phase = "reward";
+            setMessage("Sales are locked in for today. Pick one extra reward or skip it. 今天卖货阶段结束，现在可以最多选一条奖励。", "info");
+            render();
+        }
+
+        function chooseReward(rewardId) {
+            if (state.phase !== "reward" || state.gameOver || state.victory) {
+                return;
+            }
+
+            const reward = state.rewardOptions.find((entry) => entry.id === rewardId);
+
+            if (!reward || reward.cost > state.cash) {
+                setMessage("You cannot afford this reward. 这条奖励现在买不起。", "warn");
+                return;
+            }
+
+            state.cash -= reward.cost;
+            reward.apply();
+            addHistory(
+                `Day ${state.round} reward: ${reward.nameEn}`,
+                `${reward.nameZh} · ${reward.description}`,
+                reward.id === "cash" ? reward.value : reward.cost > 0 ? -reward.cost : null,
+            );
+            state.phase = "next";
+            setMessage(`Reward locked: ${reward.nameZh}. Finish the day when ready. 奖励已生效：${reward.nameZh}，准备好后进入下一天。`, reward.id === "cash" ? "good" : "info");
+            render();
+            checkForVictory();
+        }
+
+        function skipReward() {
+            if (state.phase !== "reward" || state.gameOver || state.victory) {
+                return;
+            }
+
+            state.phase = "next";
+            addHistory(`Day ${state.round} skipped reward`, "No extra reward chosen / 今天没有拿额外奖励");
+            setMessage("No reward taken. You can advance to the next day now. 你放弃了今天的额外奖励，现在可以进入下一天。", "info");
+            render();
+        }
+
+        function endRun(text) {
+            state.gameOver = true;
+            state.phase = "done";
+            setMessage(text, "warn");
+            render();
+        }
+
+        function goToNextDay() {
+            if (state.phase !== "next" || state.gameOver || state.victory) {
+                return;
+            }
+
+            const storageFee = state.nextStorageFree ? 0 : calculateStorageFee();
+            const nextRound = state.round + 1;
+            const licenseFee = getDiscountedLicenseFee();
+
+            state.cash -= storageFee;
+            state.cash -= licenseFee;
+            addHistory(
+                `Night ${state.round} deductions`,
+                `Storage ${formatMoney(storageFee)} · License ${formatMoney(licenseFee)} / 仓储 ${formatMoney(storageFee)} · 牌照 ${formatMoney(licenseFee)}`,
+                -(storageFee + licenseFee),
+            );
+            state.nextStorageFree = false;
+            state.nextLicenseDiscount = 0;
+
+            if (state.cash <= 0) {
+                endRun(`The next day's license finished you off. 牌照费结算后资金归零，本局失败。`);
+                return;
+            }
+
+            state.round = nextRound;
+            startDay();
+            setMessage(`Day ${state.round} begins. Overnight costs were ${formatMoney(storageFee)} and the license was ${formatMoney(licenseFee)}. 第 ${state.round} 天开始了，昨夜仓储扣了 ${formatMoney(storageFee)}，牌照扣了 ${formatMoney(licenseFee)}。`, "info");
+        }
+
+        skipAuctionButton.addEventListener("click", skipAuction);
+        finishSalesButton.addEventListener("click", finishSales);
+        skipRewardButton.addEventListener("click", skipReward);
+        nextRoundButton.addEventListener("click", goToNextDay);
+
+        addHistory("Run started / 开局", `Starting cash ${formatMoney(STARTING_CASH)} · reach ${formatMoney(WIN_CASH)} to win / 起始现金 ${formatMoney(STARTING_CASH)}，攒到 ${formatMoney(WIN_CASH)} 即胜利`);
+        startDay();
+        setMessage("Day 1 is live. Buy one container or skip, then manage your warehouse. 第 1 天开始：先决定买哪只柜子，或者直接跳过。", "info");
     </script>
 </body>
 </html>
