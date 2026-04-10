@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>集装箱竞拍 Demo</title>
+    <title>集装箱竞拍站</title>
     <style>
         :root {
             --bg: #0f172a;
             --panel: rgba(15, 23, 42, 0.82);
             --panel-soft: rgba(30, 41, 59, 0.82);
             --card: rgba(255, 255, 255, 0.08);
-            --line: rgba(148, 163, 184, 0.24);
+            --line: rgba(148, 163, 184, 0.36);
             --text: #e2e8f0;
             --muted: #94a3b8;
             --accent: #f59e0b;
@@ -50,7 +50,7 @@
 
         .hero {
             display: grid;
-            gap: 12px;
+            gap: 16px;
             margin-bottom: 24px;
         }
 
@@ -89,7 +89,7 @@
             gap: 4px;
             padding: 4px;
             border-radius: 999px;
-            border: 1px solid var(--line);
+            border: 1px solid rgba(148, 163, 184, 0.48);
             background: rgba(15, 23, 42, 0.55);
         }
 
@@ -112,7 +112,8 @@
             padding: 14px;
             background: #0b1120;
             border-radius: var(--radius);
-            border: 1px solid rgba(148, 163, 184, 0.22);
+            border: 1px solid rgba(148, 163, 184, 0.42);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
         }
 
         .mobile-status {
@@ -165,6 +166,90 @@
         .stat-card {
             padding: 18px 20px;
             background: rgba(15, 23, 42, 0.92) !important;
+            border-color: rgba(148, 163, 184, 0.42);
+        }
+
+        .status-strip {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .status-item {
+            position: relative;
+            min-height: 92px;
+            padding: 16px 18px;
+            border: 1px solid rgba(148, 163, 184, 0.42);
+            border-radius: 22px;
+            background: rgba(11, 17, 32, 0.92);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .status-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--muted);
+            font-size: 0.84rem;
+            font-weight: 700;
+        }
+
+        .status-value {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .status-button {
+            width: 100%;
+            min-height: 100%;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            color: inherit;
+            text-align: left;
+        }
+
+        .status-button .status-label,
+        .status-button .status-value {
+            pointer-events: none;
+        }
+
+        .status-bubble {
+            position: absolute;
+            left: 0;
+            top: calc(100% + 10px);
+            z-index: 30;
+            width: min(320px, calc(100vw - 40px));
+            padding: 14px;
+            border: 1px solid rgba(148, 163, 184, 0.42);
+            border-radius: 18px;
+            background: rgba(2, 6, 23, 0.96);
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.42);
+        }
+
+        .status-bubble[hidden] {
+            display: none;
+        }
+
+        .status-bubble-title {
+            margin: 0 0 8px;
+            font-size: 0.92rem;
+            font-weight: 800;
+        }
+
+        .status-bubble-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .status-bubble-item {
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--text);
+            line-height: 1.5;
         }
 
         .stat-label {
@@ -201,12 +286,6 @@
             line-height: 1.6;
         }
 
-        .section-block {
-            padding: 18px;
-            margin-top: 18px;
-            background: rgba(15, 23, 42, 0.5);
-        }
-
         .section-head {
             display: flex;
             justify-content: space-between;
@@ -215,7 +294,6 @@
             margin-bottom: 10px;
         }
 
-        .phase-badge,
         .lot-tag,
         .reward-tag,
         .market-tag {
@@ -409,16 +487,41 @@
             margin-top: 18px;
         }
 
-        .effect-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
         .item-chip {
             padding: 10px 12px;
             background: rgba(56, 189, 248, 0.08);
+        }
+
+        .history-toggle {
+            margin-top: 24px;
+        }
+
+        .history-toggle summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            list-style: none;
+            border: 1px solid rgba(148, 163, 184, 0.42);
+            border-radius: 18px;
+            background: rgba(15, 23, 42, 0.55);
+            font-weight: 800;
+        }
+
+        .history-toggle summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .history-toggle summary::after {
+            content: '▸';
+            color: var(--muted);
+            transition: transform 160ms ease;
+        }
+
+        .history-toggle[open] summary::after {
+            transform: rotate(90deg);
         }
 
         .warehouse-actions {
@@ -485,6 +588,7 @@
         }
 
         @media (max-width: 1080px) {
+            .status-strip,
             .stats,
             .lot-grid,
             .reward-grid,
@@ -501,9 +605,21 @@
                 border-radius: 24px;
             }
 
+            .hero-top {
+                align-items: center;
+            }
+
             .subtitle {
                 font-size: 0.96rem;
                 line-height: 1.55;
+            }
+
+            .status-item {
+                min-height: auto;
+            }
+
+            .status-bubble {
+                width: 100%;
             }
 
             .stats {
@@ -539,17 +655,42 @@
     <main class="page">
         <section class="hero">
             <div class="hero-top">
-                <p class="eyebrow" id="heroEyebrow">单页 HTML 游戏 Demo</p>
+                <div>
+                    <h1 id="heroTitle">集装箱竞拍站</h1>
+                </div>
                 <div class="language-switch" role="group" aria-label="Language selector">
                     <button type="button" id="langZhButton" class="active" aria-label="Switch to Chinese">中文</button>
                     <button type="button" id="langEnButton" aria-label="Switch to English">English</button>
                 </div>
             </div>
-            <h1 id="heroTitle">集装箱竞拍站</h1>
             <details class="rules-toggle" id="rulesToggle">
                 <summary id="rulesSummary">游戏说明</summary>
                 <p class="subtitle" id="heroSubtitle">按天推进：先买柜子（不能卖货），再卖货，然后结束当天（需要有足够钱支付牌照费），系统扣费后进入选奖励，奖励选好后自动进入下一天。现金达到 ¥10,000 即获胜。</p>
             </details>
+            <section class="status-strip">
+                <article class="status-item">
+                    <button class="status-button" id="appliedRewardsButton" type="button" aria-expanded="false" aria-controls="appliedRewardsBubble">
+                        <span class="status-label" id="appliedRewardsLabel">已生效奖励</span>
+                        <strong class="status-value" id="appliedRewardsValue">0</strong>
+                    </button>
+                    <div class="status-bubble" id="appliedRewardsBubble" hidden></div>
+                </article>
+                <article class="status-item">
+                    <button class="status-button" id="pendingRewardsButton" type="button" aria-expanded="false" aria-controls="pendingRewardsBubble">
+                        <span class="status-label" id="pendingRewardsLabel">待生效奖励</span>
+                        <strong class="status-value" id="pendingRewardsValue">0</strong>
+                    </button>
+                    <div class="status-bubble" id="pendingRewardsBubble" hidden></div>
+                </article>
+                <article class="status-item">
+                    <span class="status-label" id="warehouseCostLabel">仓库费用</span>
+                    <strong class="status-value" id="warehouseCostValue">¥0</strong>
+                </article>
+                <article class="status-item">
+                    <span class="status-label" id="warehouseAppraisalLabel">仓库总估价</span>
+                    <strong class="status-value" id="warehouseAppraisalValue">¥0</strong>
+                </article>
+            </section>
         </section>
 
         <section class="mobile-status">
@@ -605,19 +746,10 @@
                 <h2 id="auctionTitle">今日竞拍</h2>
                 <p id="auctionIntro">每天只能买一只柜子，或者选择不买；卖货阶段可以逐件卖；准备收工时结束今天，再挑一条额外奖励。</p>
 
-                <div class="section-block">
-                    <div class="section-head">
-                        <h3 style="margin: 0;" id="phaseTitle">当前阶段</h3>
-                        <span class="phase-badge" id="phaseBadge">竞拍</span>
-                    </div>
-                    <p id="phaseSummary">先从今天的几只柜子里选一只，或者直接跳过。</p>
-                    <div class="effect-list" id="effectList"></div>
-                    <div class="message" id="messageBox"></div>
-                </div>
-
                 <div class="action-row" style="margin-top: 18px;">
                     <button class="skip-button" id="skipAuctionButton">今天不买</button>
                 </div>
+                <div class="message" id="messageBox"></div>
 
                 <div class="lot-grid" id="lotGrid"></div>
 
@@ -635,15 +767,17 @@
             </section>
 
             <aside class="panel">
-                <h2 id="warehouseLogTitle">仓库与经营记录</h2>
+                <h2 id="warehouseLogTitle">仓库</h2>
                 <div id="warehouseContent">
                     <p id="warehouseLogIntro">开出来的货物都会进自己的仓库；你可以今天逐件卖，也可以付比较便宜的仓储费等以后更好的价格。</p>
                     <div class="warehouse-list" id="warehouseList" style="margin-top: 18px;"></div>
                     <div class="small" id="warehouseSummary" style="margin-top: 14px;"></div>
                 </div>
 
-                <h3 style="margin-top: 26px;" id="historyTitle">经营记录</h3>
-                <div class="history-list" id="historyList"></div>
+                <details class="history-toggle" id="historyToggle">
+                    <summary id="historyTitle" aria-expanded="false">经营记录</summary>
+                    <div class="history-list" id="historyList"></div>
+                </details>
             </aside>
         </section>
     </main>
@@ -682,6 +816,7 @@
             gameOver: false,
             victory: false,
             itemId: 1,
+            activeBonuses: [],
             language: navigator.language && navigator.language.toLowerCase().startsWith("zh") ? "zh" : "en",
             message: {
                 zh: "",
@@ -853,7 +988,6 @@
                 .map((item) => [item.name, item]),
         );
 
-        const heroEyebrow = document.getElementById("heroEyebrow");
         const heroTitle = document.getElementById("heroTitle");
         const heroSubtitle = document.getElementById("heroSubtitle");
         const langZhButton = document.getElementById("langZhButton");
@@ -878,12 +1012,20 @@
         const roundValue = document.getElementById("roundValue");
         const licenseLabel = document.getElementById("licenseLabel");
         const licenseValue = document.getElementById("licenseValue");
+        const appliedRewardsLabel = document.getElementById("appliedRewardsLabel");
+        const appliedRewardsButton = document.getElementById("appliedRewardsButton");
+        const appliedRewardsValue = document.getElementById("appliedRewardsValue");
+        const appliedRewardsBubble = document.getElementById("appliedRewardsBubble");
+        const pendingRewardsLabel = document.getElementById("pendingRewardsLabel");
+        const pendingRewardsButton = document.getElementById("pendingRewardsButton");
+        const pendingRewardsValue = document.getElementById("pendingRewardsValue");
+        const pendingRewardsBubble = document.getElementById("pendingRewardsBubble");
+        const warehouseCostLabel = document.getElementById("warehouseCostLabel");
+        const warehouseCostValue = document.getElementById("warehouseCostValue");
+        const warehouseAppraisalLabel = document.getElementById("warehouseAppraisalLabel");
+        const warehouseAppraisalValue = document.getElementById("warehouseAppraisalValue");
         const auctionTitle = document.getElementById("auctionTitle");
         const auctionIntro = document.getElementById("auctionIntro");
-        const phaseTitle = document.getElementById("phaseTitle");
-        const phaseBadge = document.getElementById("phaseBadge");
-        const phaseSummary = document.getElementById("phaseSummary");
-        const effectList = document.getElementById("effectList");
         const lotGrid = document.getElementById("lotGrid");
         const rewardTitle = document.getElementById("rewardTitle");
         const rewardLimitTag = document.getElementById("rewardLimitTag");
@@ -895,6 +1037,7 @@
         const warehouseContent = document.getElementById("warehouseContent");
         const warehouseList = document.getElementById("warehouseList");
         const warehouseSummary = document.getElementById("warehouseSummary");
+        const historyToggle = document.getElementById("historyToggle");
         const historyTitle = document.getElementById("historyTitle");
         const historyList = document.getElementById("historyList");
         const messageBox = document.getElementById("messageBox");
@@ -1090,68 +1233,6 @@
             return { labelZh: "平盘", labelEn: "Flat", tone: "neutral" };
         }
 
-        function getPhaseMeta() {
-            if (state.victory) {
-                return {
-                    badgeZh: "胜利",
-                    badgeEn: "Victory",
-                    shortZh: "胜利",
-                    shortEn: "Win",
-                    summaryZh: `你已经攒到 ${formatMoney(WIN_CASH)}，本局胜利。`,
-                    summaryEn: `You reached ${formatMoney(WIN_CASH)}. The run is yours.`,
-                };
-            }
-
-            if (state.gameOver) {
-                return {
-                    badgeZh: "失败",
-                    badgeEn: "Defeat",
-                    shortZh: "失败",
-                    shortEn: "Lose",
-                    summaryZh: "过夜扣完费用后资金断裂，本局结束。",
-                    summaryEn: "Daily deductions drained your cash. Run over.",
-                };
-            }
-
-            if (state.phase === "auction") {
-                return {
-                    badgeZh: "竞拍",
-                    badgeEn: "Auction",
-                    shortZh: "拍卖",
-                    shortEn: "Bid",
-                    summaryZh: "先从今天的几只柜子里选一只，或者直接跳过。",
-                    summaryEn: "Choose one lot for today, or skip the auction.",
-                };
-            }
-
-            if (state.phase === "sales") {
-                const licenseFee = getDiscountedLicenseFee();
-                const storageFee = calculateStorageFee();
-                return {
-                    badgeZh: "卖货",
-                    badgeEn: "Sales",
-                    summaryZh: `逐件卖货或留到下一天；结束今天需要至少 ${formatMoney(licenseFee)} 支付牌照费（仓储 ${formatMoney(storageFee)}）。`,
-                    summaryEn: `Sell items or hold. Ending today requires ${formatMoney(licenseFee)} for the license fee (storage ${formatMoney(storageFee)}).`,
-                };
-            }
-
-            if (state.phase === "reward") {
-                return {
-                    badgeZh: "奖励",
-                    badgeEn: "Reward",
-                    summaryZh: "费用已结算，选一条奖励后自动进入下一天，也可以直接放弃。",
-                    summaryEn: "Fees settled. Pick one reward then the next day starts, or skip it.",
-                };
-            }
-
-            return {
-                badgeZh: "结束",
-                badgeEn: "Done",
-                summaryZh: "本局已结束。",
-                summaryEn: "Run complete.",
-            };
-        }
-
         function getDiscountedLicenseFee() {
             const nextBaseFee = licenseFeeForRound(state.round + 1);
             return Math.round(nextBaseFee * (1 - state.nextLicenseDiscount));
@@ -1168,9 +1249,8 @@
 
         function renderStaticText() {
             document.documentElement.lang = state.language === "zh" ? "zh-CN" : "en-US";
-            document.title = localize("集装箱竞拍 Demo", "Container Auction Demo");
+            document.title = localize("集装箱竞拍站", "Container Auction");
 
-            heroEyebrow.textContent = localize("单页 HTML 游戏 Demo", "Single-file HTML game demo");
             heroTitle.textContent = localize("集装箱竞拍站", "Container Auction");
             heroSubtitle.textContent = localize(
                 "按天推进：先买柜子（不能卖货），再卖货，然后结束当天（需要有足够钱支付牌照费），系统扣费后进入选奖励，奖励选好后自动进入下一天。现金达到 ¥10,000 即获胜。",
@@ -1184,6 +1264,10 @@
             openedLabel.textContent = localize("当日卖价", "Sell Value");
             roundLabel.textContent = localize("当前天数", "Day");
             licenseLabel.textContent = localize("牌照费", "License");
+            appliedRewardsLabel.textContent = localize("已生效奖励", "Applied Rewards");
+            pendingRewardsLabel.textContent = localize("待生效奖励", "Pending Rewards");
+            warehouseCostLabel.textContent = localize("仓库费用", "Warehouse Cost");
+            warehouseAppraisalLabel.textContent = localize("仓库总估价", "Warehouse Appraisal");
 
             mobileCashLabel.textContent = localize("现金", "Cash");
             mobileRoundLabel.textContent = localize("天数", "Day");
@@ -1197,7 +1281,6 @@
             };
             auctionTitle.textContent = phaseTitles[state.phase] || localize("今日操作", "Action");
             auctionIntro.hidden = true;
-            phaseTitle.textContent = localize("当前阶段", "Current Phase");
             rewardTitle.textContent = localize("额外奖励", "Extra Reward");
             rewardLimitTag.textContent = localize("最多选一条", "Choose one");
             rewardIntro.textContent = localize(
@@ -1216,12 +1299,15 @@
         function renderStats() {
             const appraisalTotal = state.inventory.reduce((sum, item) => sum + item.appraisal, 0);
             const currentTotal = state.inventory.reduce((sum, item) => sum + item.currentPrice, 0);
+            const storageFee = calculateStorageFee();
             cashValue.textContent = formatMoney(state.cash);
             netWorthValue.textContent = formatMoney(calculateNetWorth());
             inventoryValue.textContent = formatMoney(appraisalTotal);
             openedValue.textContent = formatMoney(currentTotal);
             roundValue.textContent = state.round;
             licenseValue.textContent = formatMoney(getDiscountedLicenseFee());
+            warehouseCostValue.textContent = formatMoney(storageFee);
+            warehouseAppraisalValue.textContent = formatMoney(appraisalTotal);
             mobileCashValue.textContent = formatMoney(state.cash);
             mobileRoundValue.textContent = formatDayLabel(state.round);
             mobileInvValue.textContent = formatMoney(currentTotal);
@@ -1229,55 +1315,51 @@
         }
 
         function renderEffects() {
-            effectList.innerHTML = "";
             const pending = [];
-
-            if (state.nextLotDiscount > 0) {
-                pending.push({
-                    zh: state.phase === "auction"
-                        ? `今日竞拍价已打 ${Math.round(state.nextLotDiscount * 100)}% 折`
-                        : `下一天竞拍价 -${Math.round(state.nextLotDiscount * 100)}%`,
-                    en: state.phase === "auction"
-                        ? `Today's bids already have a ${Math.round(state.nextLotDiscount * 100)}% discount`
-                        : `Next day bids -${Math.round(state.nextLotDiscount * 100)}%`,
-                });
-            }
 
             if (state.nextStorageFree) {
                 pending.push({
-                    zh: "下一次过夜仓储全免",
-                    en: "Next overnight storage is free",
-                });
-            }
-
-            if (state.nextMarketBoost > 0) {
-                pending.push({
-                    zh: `明天卖价 +${Math.round(state.nextMarketBoost * 100)}%`,
-                    en: `Tomorrow sell prices +${Math.round(state.nextMarketBoost * 100)}%`,
+                    zh: "下一次过夜仓储费全免",
+                    en: "Next overnight storage is fully waived",
                 });
             }
 
             if (state.nextLicenseDiscount > 0) {
                 pending.push({
-                    zh: `下一次牌照减免 ${Math.round(state.nextLicenseDiscount * 100)}%`,
-                    en: `Next license -${Math.round(state.nextLicenseDiscount * 100)}%`,
+                    zh: `下一次牌照费 -${Math.round(state.nextLicenseDiscount * 100)}%`,
+                    en: `Next license fee -${Math.round(state.nextLicenseDiscount * 100)}%`,
                 });
             }
 
-            if (pending.length === 0) {
-                const chip = document.createElement("div");
-                chip.className = "item-chip small";
-                chip.textContent = localize("当前没有待生效奖励", "No pending bonuses");
-                effectList.appendChild(chip);
-                return;
-            }
+            appliedRewardsValue.textContent = state.activeBonuses.length;
+            pendingRewardsValue.textContent = pending.length;
 
-            pending.forEach((entry) => {
-                const chip = document.createElement("div");
-                chip.className = "item-chip small";
-                chip.textContent = localize(entry.zh, entry.en);
-                effectList.appendChild(chip);
-            });
+            renderRewardBubble(
+                appliedRewardsButton,
+                appliedRewardsBubble,
+                localize("已生效奖励", "Applied Rewards"),
+                state.activeBonuses,
+                localize("本日暂无已生效奖励。", "No rewards have taken effect today."),
+            );
+            renderRewardBubble(
+                pendingRewardsButton,
+                pendingRewardsBubble,
+                localize("待生效奖励", "Pending Rewards"),
+                pending,
+                localize("暂无待生效奖励。", "No pending rewards right now."),
+            );
+        }
+
+        function renderRewardBubble(button, bubble, title, entries, emptyText) {
+            const listHtml = entries.length > 0
+                ? entries.map((entry) => `<div class="status-bubble-item">${localize(entry.zh, entry.en)}</div>`).join("")
+                : `<div class="status-bubble-item">${emptyText}</div>`;
+
+            bubble.innerHTML = `
+                <div class="status-bubble-title">${title}</div>
+                <div class="status-bubble-list">${listHtml}</div>
+            `;
+            button.setAttribute("aria-label", `${title}: ${entries.length}`);
         }
 
         function renderLots() {
@@ -1428,23 +1510,14 @@
         }
 
         function renderPhase() {
-            const meta = getPhaseMeta();
-            phaseBadge.textContent = localize(meta.badgeZh, meta.badgeEn);
-            phaseSummary.textContent = localize(meta.summaryZh, meta.summaryEn);
-
             const isAuction = state.phase === "auction" && !state.gameOver && !state.victory;
             skipAuctionButton.hidden = !isAuction;
             skipAuctionButton.disabled = !isAuction;
             skipRewardButton.disabled = state.phase !== "reward" || state.gameOver || state.victory;
 
-            // Show/hide warehouse content based on phase
             const showWarehouse = state.phase === "sales" && !state.gameOver && !state.victory;
             warehouseContent.hidden = !showWarehouse;
-            warehouseLogTitle.textContent = showWarehouse
-                ? localize("仓库", "Warehouse")
-                : localize("经营记录", "History");
-
-            // Show/hide lot grid: only during auction phase
+            warehouseLogTitle.textContent = localize("仓库", "Warehouse");
             lotGrid.hidden = state.phase !== "auction" || state.gameOver || state.victory;
         }
 
@@ -1480,6 +1553,29 @@
         function startDay() {
             state.phase = "auction";
             state.chosenLotName = "";
+            state.activeBonuses = [];
+
+            if (state.nextLotDiscount > 0) {
+                state.activeBonuses.push({
+                    zh: `今日竞拍价已打 ${Math.round(state.nextLotDiscount * 100)}% 折`,
+                    en: `Today's bids already have a ${Math.round(state.nextLotDiscount * 100)}% discount`,
+                });
+            }
+
+            if (state.nextMarketBoost > 0) {
+                state.activeBonuses.push({
+                    zh: `今天卖价 +${Math.round(state.nextMarketBoost * 100)}%`,
+                    en: `Today's sell prices +${Math.round(state.nextMarketBoost * 100)}%`,
+                });
+            }
+
+            if (state.nextLuckyLot) {
+                state.activeBonuses.push({
+                    zh: "今天拍卖额外刷出一只惊喜柜",
+                    en: "Today's auction has one extra Lucky lot",
+                });
+            }
+
             state.marketBoostToday = state.nextMarketBoost;
             state.nextMarketBoost = 0;
             buildMarketTable();
@@ -1638,8 +1734,8 @@
 
             state.phase = "reward";
             setMessage(
-                "今天收工，费用已结算，选一条奖励后自动进入下一天（也可放弃）。",
-                "Day closed and fees settled. Pick a reward to continue, or skip it.",
+                "今天结算完成，可以选择一条奖励，也可以直接放弃。",
+                "Settlement complete. Choose a reward or skip it.",
                 "info",
             );
             render();
@@ -1680,6 +1776,14 @@
             const rewardDescription = parsePairText(reward.description);
             state.cash -= reward.cost;
             reward.apply();
+
+            if (reward.id === "cash") {
+                state.activeBonuses.push({
+                    zh: `速返现金已到账 ${formatMoney(reward.value)}`,
+                    en: `Quick cashback received ${formatMoney(reward.value)}`,
+                });
+            }
+
             addHistory(
                 `第 ${state.round} 天奖励：${reward.nameZh}`,
                 `Day ${state.round} reward: ${reward.nameEn}`,
@@ -1722,6 +1826,31 @@
         dayActionButton.addEventListener("click", endToday);
         langZhButton.addEventListener("click", () => setLanguage("zh"));
         langEnButton.addEventListener("click", () => setLanguage("en"));
+        appliedRewardsButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const shouldOpen = appliedRewardsBubble.hidden;
+            pendingRewardsBubble.hidden = true;
+            appliedRewardsBubble.hidden = !shouldOpen;
+            appliedRewardsButton.setAttribute("aria-expanded", String(shouldOpen));
+            pendingRewardsButton.setAttribute("aria-expanded", "false");
+        });
+        pendingRewardsButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            const shouldOpen = pendingRewardsBubble.hidden;
+            appliedRewardsBubble.hidden = true;
+            pendingRewardsBubble.hidden = !shouldOpen;
+            pendingRewardsButton.setAttribute("aria-expanded", String(shouldOpen));
+            appliedRewardsButton.setAttribute("aria-expanded", "false");
+        });
+        historyToggle.addEventListener("toggle", () => {
+            historyTitle.setAttribute("aria-expanded", String(historyToggle.open));
+        });
+        document.addEventListener("click", () => {
+            appliedRewardsBubble.hidden = true;
+            pendingRewardsBubble.hidden = true;
+            appliedRewardsButton.setAttribute("aria-expanded", "false");
+            pendingRewardsButton.setAttribute("aria-expanded", "false");
+        });
 
         addHistory(
             "开局",
