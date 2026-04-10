@@ -500,8 +500,8 @@
             <div class="hero-top">
                 <p class="eyebrow" id="heroEyebrow">单页 HTML 游戏 Demo</p>
                 <div class="language-switch" role="group" aria-label="Language selector">
-                    <button type="button" id="langZhButton" class="active">中文</button>
-                    <button type="button" id="langEnButton">English</button>
+                    <button type="button" id="langZhButton" class="active" aria-label="Switch to Chinese">中文</button>
+                    <button type="button" id="langEnButton" aria-label="Switch to English">English</button>
                 </div>
             </div>
             <h1 id="heroTitle">集装箱竞拍站</h1>
@@ -862,7 +862,7 @@
         }
 
         function localize(zhText, enText) {
-            return state.language === "zh" ? (zhText || enText || "") : (enText || zhText || "");
+            return state.language === "zh" ? (zhText ?? enText ?? "") : (enText ?? zhText ?? "");
         }
 
         function parsePairText(text) {
@@ -1126,7 +1126,7 @@
         }
 
         function renderStaticText() {
-            document.documentElement.lang = state.language === "zh" ? "zh-CN" : "en";
+            document.documentElement.lang = state.language === "zh" ? "zh-CN" : "en-US";
             document.title = localize("集装箱竞拍 Demo", "Container Auction Demo");
 
             heroEyebrow.textContent = localize("单页 HTML 游戏 Demo", "Single-file HTML game demo");
