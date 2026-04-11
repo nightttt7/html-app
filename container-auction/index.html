@@ -416,16 +416,6 @@
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 12px 24px rgba(78, 66, 42, 0.08);
         }
 
-        .lot-card::before,
-        .reward-card::before,
-        .warehouse-item::before {
-            content: "";
-            position: absolute;
-            inset: 0 0 auto;
-            height: 8px;
-            background: linear-gradient(90deg, var(--accent), var(--signal), var(--accent-cool));
-        }
-
         .lot-top,
         .warehouse-top,
         .reward-top,
@@ -446,8 +436,9 @@
         }
 
         .duration-tag {
-            background: rgba(34, 197, 94, 0.14);
-            color: #bbf7d0;
+            background: rgba(141, 214, 166, 0.28);
+            border-color: rgba(37, 101, 58, 0.18);
+            color: #1e5a35;
         }
 
         .lot-name,
@@ -733,6 +724,15 @@
                 min-height: auto;
             }
 
+            .status-stack {
+                min-width: 0;
+                gap: 6px;
+            }
+
+            .status-row {
+                gap: 6px;
+            }
+
             .status-bubble {
                 width: 100%;
             }
@@ -740,6 +740,21 @@
             .status-header {
                 top: 8px;
                 width: calc(100% - 24px);
+                padding: 8px;
+            }
+
+            .status-item {
+                padding: 10px 10px 9px;
+            }
+
+            .status-label {
+                margin-bottom: 5px;
+                font-size: 0.68rem;
+                letter-spacing: 0.06em;
+            }
+
+            .status-value {
+                font-size: 0.95rem;
             }
 
             .floating-day-button {
