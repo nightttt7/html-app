@@ -1,8 +1,3 @@
----
-description: "Use when working on the container-auction app, including gameplay flow, responsive UI, reward cards, the fixed status header, or bilingual copy updates."
-applyTo: "container-auction/**"
----
-
 # Container Auction Guidelines
 
 - This folder is a standalone static HTML app deployed as the `container-auction` Worker.
