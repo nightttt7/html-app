@@ -336,6 +336,7 @@
 
         <div>
             <button class="btn-toggle" id="btn-show-names" onclick="toggleNoteNames()">显示音名</button>
+            <button class="btn-toggle" id="btn-song-retry-toggle" onclick="toggleRetryMode()">开启试错</button>
         </div>
 
         <div id="staff-container"></div>
@@ -577,6 +578,11 @@
         let songResults = [];       // 当前小节每个音符的结果
         let songInputs = [];        // 用户实际输入的MIDI音符
         let songComplete = false;
+        let songRetryMode = false;
+        let songMistakeCounts = [];
+        let songTotalCompleted = 0;
+        let songTotalCorrect = 0;
+        let songTotalMistakes = 0;
 
         // 练习模式状态
         let practiceMode = false;
@@ -585,6 +591,9 @@
         let practiceInputs = [];     // 每个位置用户实际输入的MIDI音符
         let practiceIndex = 0;       // 当前需要输入的位置
         let practiceComplete = false;
+        let practiceTotalCompleted = 0;
+        let practiceTotalCorrect = 0;
+        let practiceTotalMistakes = 0;
 
         const btnPractice = document.getElementById('btn-practice');
         const btnRestart = document.getElementById('btn-restart');
@@ -592,12 +601,28 @@
         const difficultyEl = document.getElementById('difficulty');
         const customNotesPanel = document.getElementById('custom-notes-panel');
         const btnShowNames = document.getElementById('btn-show-names');
+        const btnSongRetryToggle = document.getElementById('btn-song-retry-toggle');
         const btnSong = document.getElementById('btn-song');
         const btnSongRestart = document.getElementById('btn-song-restart');
         const btnSongSegmentRestart = document.getElementById('btn-song-segment-restart');
         const songPanel = document.getElementById('song-panel');
         const songSelect = document.getElementById('song-select');
         const songInfoEl = document.getElementById('song-info');
+
+        function updateRetryToggleUI() {
+            const shouldShow = songMode || practiceMode;
+            btnSongRetryToggle.style.display = shouldShow ? 'inline-block' : 'none';
+            btnSongRetryToggle.textContent = songRetryMode ? '关闭试错' : '开启试错';
+            btnSongRetryToggle.classList.toggle('active', songRetryMode);
+        }
+
+        function updatePracticeInfo(extraMessage = '') {
+            let info = `进度: ${practiceTotalCompleted} / ${MAX_NOTES}  |  正确: ${practiceTotalCorrect}  |  错误: ${practiceTotalMistakes}  |  试错: ${songRetryMode ? '开' : '关'}`;
+            if (extraMessage) {
+                info += `  ${extraMessage}`;
+            }
+            practiceInfoEl.textContent = info;
+        }
 
         // 初始化歌曲选择列表
         SONGS.forEach((s, i) => {
@@ -606,6 +631,7 @@
             opt.textContent = s.name;
             songSelect.appendChild(opt);
         });
+        updateRetryToggleUI();
 
         // 音符名称列表
         const ALL_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -828,6 +854,7 @@
                 btnPractice.classList.remove('active');
                 btnRestart.classList.remove('show');
                 practiceInfoEl.textContent = '';
+                updateRetryToggleUI();
                 initStaff();
             } else {
                 if (songMode) exitSongMode(); // 先退出歌曲模式
@@ -835,6 +862,7 @@
                 btnPractice.textContent = '退出练习';
                 btnPractice.classList.add('active');
                 btnRestart.classList.add('show');
+                updateRetryToggleUI();
                 startNewRound();
             }
         }
@@ -854,7 +882,10 @@
             practiceIndex = 0;
             practiceComplete = false;
             practiceStartTime = null;
-            practiceInfoEl.textContent = `进度: 0 / ${MAX_NOTES}`;
+            practiceTotalCompleted = 0;
+            practiceTotalCorrect = 0;
+            practiceTotalMistakes = 0;
+            updatePracticeInfo();
             renderPractice();
         }
 
@@ -941,6 +972,19 @@
             }
         }
 
+        function toggleRetryMode() {
+            songRetryMode = !songRetryMode;
+            updateRetryToggleUI();
+            log(`${practiceMode ? '练习' : '歌曲'}试错模式: ${songRetryMode ? '开启' : '关闭'}`);
+            if (songMode) {
+                updateSongInfo();
+                renderSongMeasure();
+            } else if (practiceMode) {
+                updatePracticeInfo();
+                renderPractice();
+            }
+        }
+
         // ===== 歌曲模式 =====
         function toggleSongMode() {
             if (songMode) {
@@ -954,6 +998,7 @@
                 btnSongSegmentRestart.classList.add('show');
                 songPanel.classList.add('show');
                 document.getElementById('difficulty-panel').style.display = 'none';
+                updateRetryToggleUI();
                 startSong();
             }
         }
@@ -968,6 +1013,7 @@
             songPanel.classList.remove('show');
             document.getElementById('difficulty-panel').style.display = '';
             songInfoEl.textContent = '';
+            updateRetryToggleUI();
             initStaff();
         }
 
@@ -982,17 +1028,20 @@
         function restartSongSegment() {
             if (!songMode || !currentSong) return;
 
-            const pageAnswered = songResults.filter(result => result !== null).length;
+            const pageCompleted = songResults.filter(result => result !== null).length;
             const pageCorrect = songResults.filter(result => result === 'correct').length;
-            songTotalAnswered = Math.max(0, songTotalAnswered - pageAnswered);
+            const pageMistakes = songMistakeCounts.reduce((sum, count) => sum + count, 0);
+            songTotalCompleted = Math.max(0, songTotalCompleted - pageCompleted);
             songTotalCorrect = Math.max(0, songTotalCorrect - pageCorrect);
+            songTotalMistakes = Math.max(0, songTotalMistakes - pageMistakes);
 
             songNoteIndex = findNextPlayableSongIndex(getSongPageNotes(), 0);
             songComplete = false;
             const totalNotes = getSongPageNotes().length;
             songResults = new Array(totalNotes).fill(null);
             songInputs = new Array(totalNotes).fill(null);
-            if (songTotalAnswered === 0) {
+            songMistakeCounts = new Array(totalNotes).fill(0);
+            if (songTotalCompleted === 0 && songTotalMistakes === 0) {
                 songStartTime = null;
             }
             updateSongInfo();
@@ -1007,7 +1056,8 @@
             songComplete = false;
             songStartTime = null;
             songTotalCorrect = 0;
-            songTotalAnswered = 0;
+            songTotalCompleted = 0;
+            songTotalMistakes = 0;
             // 计算整首歌的总音符数
             songTotalNotes = currentSong.measures.reduce((s, m) => s + m.filter(isPlayableSongItem).length, 0);
             // songResults 覆盖当前页所有音符
@@ -1015,6 +1065,7 @@
             const totalNotes = pageNotes.length;
             songResults = new Array(totalNotes).fill(null);
             songInputs = new Array(totalNotes).fill(null);
+            songMistakeCounts = new Array(totalNotes).fill(0);
             songNoteIndex = findNextPlayableSongIndex(pageNotes, 0);
             updateSongInfo();
             renderSongMeasure();
@@ -1039,10 +1090,10 @@
             const total = currentSong.measures.length;
             const endIdx = Math.min(songMeasureIndex + SONG_MEASURES_PER_PAGE, total);
             let info = `${currentSong.name}  小节: ${songMeasureIndex + 1}-${endIdx} / ${total}`;
-            info += `  |  进度: ${songTotalAnswered} / ${songTotalNotes}`;
-            if (songTotalAnswered > 0) {
-                info += `  |  正确: ${songTotalCorrect}`;
-            }
+            info += `  |  进度: ${songTotalCompleted} / ${songTotalNotes}`;
+            info += `  |  正确: ${songTotalCorrect}`;
+            info += `  |  错误: ${songTotalMistakes}`;
+            info += `  |  试错: ${songRetryMode ? '开' : '关'}`;
             songInfoEl.textContent = info;
         }
 
@@ -1142,23 +1193,37 @@
             const allNotes = getSongPageNotes();
             if (songNoteIndex < 0 || songNoteIndex >= allNotes.length) return;
             const target = allNotes[songNoteIndex].midi;
+            let shouldAdvance = true;
 
             if (midi === target) {
                 songResults[songNoteIndex] = 'correct';
                 songInputs[songNoteIndex] = midi;
+                songTotalCompleted++;
                 songTotalCorrect++;
                 log(`♪ 正确: ${midiToNoteName(midi)}`);
             } else {
                 songResults[songNoteIndex] = 'wrong';
                 songInputs[songNoteIndex] = midi;
+                songMistakeCounts[songNoteIndex]++;
+                songTotalMistakes++;
+                shouldAdvance = !songRetryMode;
+                if (shouldAdvance) {
+                    songTotalCompleted++;
+                }
                 log(`♪ 错误: 期望 ${midiToNoteName(target)}，输入 ${midiToNoteName(midi)}`);
             }
 
-            songTotalAnswered++;
             // 第一次输入时记录开始时间
             if (songStartTime === null) {
                 songStartTime = Date.now();
             }
+
+            if (!shouldAdvance) {
+                updateSongInfo();
+                renderSongMeasure();
+                return;
+            }
+
             const nextPlayableIndex = findNextPlayableSongIndex(allNotes, songNoteIndex + 1);
 
             if (nextPlayableIndex === -1) {
@@ -1168,18 +1233,20 @@
                 if (nextMeasureIndex >= currentSong.measures.length) {
                     songComplete = true;
                     const elapsed = ((Date.now() - songStartTime) / 1000).toFixed(1);
-                    songInfoEl.textContent = `${currentSong.name}  ✓ 完成！用时: ${elapsed}s  正确: ${songTotalCorrect}/${songTotalNotes}  按任意键重新开始`;
+                    songInfoEl.textContent = `${currentSong.name}  ✓ 完成！用时: ${elapsed}s  正确: ${songTotalCorrect}/${songTotalNotes}  错误: ${songTotalMistakes}  按任意键重新开始`;
                     return;
                 }
                 songMeasureIndex = nextMeasureIndex;
                 const nextPageNotes = getSongPageNotes();
                 songResults = new Array(nextPageNotes.length).fill(null);
                 songInputs = new Array(nextPageNotes.length).fill(null);
+                songMistakeCounts = new Array(nextPageNotes.length).fill(0);
                 songNoteIndex = findNextPlayableSongIndex(nextPageNotes, 0);
                 updateSongInfo();
                 setTimeout(() => renderSongMeasure(), 400);
             } else {
                 songNoteIndex = nextPlayableIndex;
+                updateSongInfo();
                 renderSongMeasure();
             }
         }
@@ -1389,26 +1456,37 @@
             }
 
             const target = practiceNotes[practiceIndex];
+            let shouldAdvance = true;
             if (midi === target) {
                 practiceResults[practiceIndex] = 'correct';
                 practiceInputs[practiceIndex] = midi;
+                practiceTotalCompleted++;
+                practiceTotalCorrect++;
                 log(`✓ 正确: ${midiToNoteName(midi)}`);
             } else {
                 practiceResults[practiceIndex] = 'wrong';
                 practiceInputs[practiceIndex] = midi;
+                practiceTotalMistakes++;
+                shouldAdvance = !songRetryMode;
+                if (shouldAdvance) {
+                    practiceTotalCompleted++;
+                }
                 log(`✗ 错误: 期望 ${midiToNoteName(target)}，输入 ${midiToNoteName(midi)}`);
             }
 
-            practiceIndex++;
+            if (!shouldAdvance) {
+                updatePracticeInfo();
+                renderPractice();
+                return;
+            }
 
-            const correctCount = practiceResults.filter(r => r === 'correct').length;
-            const answeredCount = practiceResults.filter(r => r !== null).length;
-            practiceInfoEl.textContent = `进度: ${answeredCount} / ${MAX_NOTES}  |  正确: ${correctCount}`;
+            practiceIndex++;
+            updatePracticeInfo();
 
             if (practiceIndex >= MAX_NOTES) {
                 practiceComplete = true;
                 const elapsed = ((Date.now() - practiceStartTime) / 1000).toFixed(1);
-                practiceInfoEl.textContent += `  ✓ 完成！用时: ${elapsed}s  按任意键开始新一局`;
+                updatePracticeInfo(`✓ 完成！用时: ${elapsed}s  按任意键开始新一局`);
             }
 
             renderPractice();
